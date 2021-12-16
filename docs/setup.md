@@ -1,10 +1,12 @@
-# Setup
+# SETUP
 
 ## PROVISION THE PLAYGROUND
 
 Before starting to run the demos  you should have installed some software on your system.
 
 For my tests, I’m going to setup two clusters on a virtual machine hosted on [CrownLabs](https://crownlabs.polito.it/). The VM have 8 CORE and 16 GB of RAM.
+
+> NOTE: On the `scripts` directory, there is a setup script with all commands below used.
 
 First things first, I'm going to install helm due to the liqoctl uses it to configure and install the Liqo chart.
 
@@ -22,7 +24,7 @@ chmod +x ./kind
 sudo mv ./kind /usr/bin/kind
 ```
 
-### Personal setup
+### PERSONAL SETUP
 
 In my case, I'm installing the zsh shell with [oh-my-zsh](https://ohmyz.sh/#install) and the [powerlevel10k](https://github.com/romkatv/powerlevel10k) theme. In addition, I'm setting up some of my personal [dotfiles](https://github.com/Ralls0/dotfiles) for the tools vim and zsh.
 
@@ -36,3 +38,12 @@ echo "$(curl -fsSL https://raw.githubusercontent.com/Ralls0/dotfiles/main/.zshrc
 mkdir $HOME/.tmp
 echo "$(curl -fsSL https://raw.githubusercontent.com/Ralls0/dotfiles/main/.vimrc)" > $HOME/.vimrc
 ```
+
+### INSTALL LIQO
+
+Before installing Liqo, you should set the right `kubeconfig` for your cluster properly. The Liqo installer leverages `kubectl`: by default `kubectl` refers to the default identity in `~/.kube/config` but you can override this configuration by exporting a `KUBECONFIG` variable.
+
+To do so, I'm going to use a simpe script (`scripts/liqoInstaller.sh`) that creates a cluster by means of `kind` and install Liqo on it.
+
+> NOTE: For the official docs see the upstream: [liqoctl](https://doc.liqo.io/installation/#liqoctl)
+
