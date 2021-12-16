@@ -60,15 +60,25 @@ function personal_setup(){
   then
     echo "[i] Installing oh-my-zsh..."
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  fi
+  if [[ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]]
+  then
     echo "[i] Installing powerlevel10k theme..."
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+  fi 
+  if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]]
+  then
     echo "[i] Adding zsh-autosuggestions plugin..."
     git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+  fi 
+  if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]]
+  then  
     echo "[i] Adding zsh-syntax-highlighting plugin..."
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-    echo "[i] Replacing zshrc file..."
-    echo "$(curl -fsSL https://raw.githubusercontent.com/Ralls0/dotfiles/main/.zshrc)" > $HOME/.zshrc
-  fi
+  fi 
+  echo "[i] Replacing zshrc file..."
+  echo "$(curl -fsSL https://raw.githubusercontent.com/Ralls0/dotfiles/main/.zshrc)" > $HOME/.zshrc
+  source $HOME/.zshrc
 }
 
 install_docker
