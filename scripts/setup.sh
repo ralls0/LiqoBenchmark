@@ -10,7 +10,7 @@ function install_helm(){
   fi
 }
 
-function install_docker() {
+function install_docker(){
   if ! command -v docker &> /dev/null
   then
 	  echo "[i] Installing docker..."
@@ -23,7 +23,7 @@ function install_docker() {
   fi
 }
 
-function install_kind() {
+function install_kind(){
   if ! command -v kind &> /dev/null
   then
     echo "[i] Installing kind..."
@@ -33,7 +33,7 @@ function install_kind() {
   fi
 }
 
-function install_K8s() {
+function install_K8s(){
   if ! command -v kubeadm &> /dev/null
   then
     echo "[i] Installing kubelet, kubeadm and kubectl..."
@@ -47,7 +47,7 @@ function install_K8s() {
   fi
 }
 
-function personal_setup() {
+function personal_setup(){
   echo "[i] Replacing vimrc file..."
   mkdir $HOME/.tmp
   echo "$(curl -fsSL https://raw.githubusercontent.com/Ralls0/dotfiles/main/.vimrc)" > $HOME/.vimrc
