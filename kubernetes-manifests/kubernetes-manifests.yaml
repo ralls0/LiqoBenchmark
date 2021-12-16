@@ -318,7 +318,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.3.3
+        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.3.1
         ports:
         - containerPort: 50051
         env:
@@ -530,7 +530,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.3.3
+        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.3.1
         ports:
         - name: grpc
           containerPort: 7000
