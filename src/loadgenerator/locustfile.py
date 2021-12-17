@@ -15,7 +15,14 @@
 # limitations under the License.
 
 import random
-from locust import HttpUser, TaskSet, between
+from locust import HttpUser, task, between
+import math
+
+def sinNorm(jump = 10):
+  i = 0
+  while i < 360:
+    yield math.sin(i) if math.sin(i) > 0 else math.sin(i)*-1
+    i = i+jump if i+jump < 360 else 0
 
 products = [
     '0PUK6V6EV0',
@@ -28,54 +35,74 @@ products = [
     'LS4PSXUNUM',
     'OLJCESPC7Z']
 
-def index(l):
-    l.client.get("/")
+class WebsiteUserIndex(HttpUser):
+    sinGen = sinNorm()
 
-def setCurrency(l):
-    currencies = ['EUR', 'USD', 'JPY', 'CAD']
-    l.client.post("/setCurrency",
-        {'currency_code': random.choice(currencies)})
+    def wait_time(self):
+        return next(self.sinGen)
 
-def browseProduct(l):
-    l.client.get("/product/" + random.choice(products))
+    @task
+    def index(self):
+        self.client.get("/")
 
-def viewCart(l):
-    l.client.get("/cart")
+class WebsiteUserSetCurrency(HttpUser):
+    sinGen = sinNorm()
+    
+    def wait_time(self):
+        return next(self.sinGen)
 
-def addToCart(l):
-    product = random.choice(products)
-    l.client.get("/product/" + product)
-    l.client.post("/cart", {
-        'product_id': product,
-        'quantity': random.choice([1,2,3,4,5,10])})
+    @task
+    def setCurrency(self):
+        currencies = ['EUR', 'USD', 'JPY', 'CAD']
+        self.client.post("/setCurrency",
+            {'currency_code': random.choice(currencies)})
 
-def checkout(l):
-    addToCart(l)
-    l.client.post("/cart/checkout", {
-        'email': 'someone@example.com',
-        'street_address': '1600 Amphitheatre Parkway',
-        'zip_code': '94043',
-        'city': 'Mountain View',
-        'state': 'CA',
-        'country': 'United States',
-        'credit_card_number': '4432-8015-6152-0454',
-        'credit_card_expiration_month': '1',
-        'credit_card_expiration_year': '2039',
-        'credit_card_cvv': '672',
-    })
+class WebsiteUserBrowseProduct(HttpUser):
+    sinGen = sinNorm()
+    
+    def wait_time(self):
+        return next(self.sinGen)
 
-class UserBehavior(TaskSet):
+    @task
+    def browseProduct(self):
+        self.client.get("/product/" + random.choice(products))
 
-    def on_start(self):
-        index(self)
+class WebsiteUserViewCart(HttpUser):
+    sinGen = sinNorm()
+    
+    def wait_time(self):
+        return next(self.sinGen)
 
-    tasks = {index: 1,
-        setCurrency: 2,
-        browseProduct: 10,
-        addToCart: 2,
-        viewCart: 3,
-        checkout: 1}
+    @task
+    def viewCart(self):
+        self.client.get("/cart")
 
-class WebsiteUser(HttpUser):
-    tasks = [UserBehavior]
-    wait_time = between(1, 10)
+class WebsiteUserAddToCart(HttpUser):
+    sinGen = sinNorm()
+    
+    def wait_time(self):
+        return next(self.sinGen)
+
+    def addToCart(self):
+        product = random.choice(products)
+        self.client.get("/product/" + product)
+        self.client.post("/cart", {
+            'product_id': product,
+            'quantity': random.choice([1,2,3,4,5,10])})
+
+    @task
+    def checkout(self):
+        self.addToCart(1)
+        self.client.post("/cart/checkout", {
+            'email': 'someone@example.com',
+            'street_address': '1600 Amphitheatre Parkway',
+            'zip_code': '94043',
+            'city': 'Mountain View',
+            'state': 'CA',
+            'country': 'United States',
+            'credit_card_number': '4432-8015-6152-0454',
+            'credit_card_expiration_month': '1',
+            'credit_card_expiration_year': '2039',
+            'credit_card_cvv': '672',
+        })
+
