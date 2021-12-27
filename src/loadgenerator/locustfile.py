@@ -18,10 +18,10 @@ import random
 from locust import HttpUser, task, between
 import math
 
-def sinNorm(jump = 10):
+def sinNorm(jump = 15):
   i = 0
   while i < 360:
-    yield math.sin(i) if math.sin(i) > 0 else math.sin(i)*-1
+    yield math.sin(i)*10 if math.sin(i) >= 0 else (math.sin(i)*-1)*10
     i = i+jump if i+jump < 360 else 0
 
 products = [
