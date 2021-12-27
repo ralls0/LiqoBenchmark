@@ -55,40 +55,6 @@ function install_K8s(){
   fi
 }
 
-function personal_setup(){
-  echo "[i] Replacing vimrc file..."
-  mkdir $HOME/.tmp
-  echo "$(curl -fsSL https://raw.githubusercontent.com/Ralls0/dotfiles/main/.vimrc)" > $HOME/.vimrc
-  if ! command -v zsh &> /dev/null
-  then
-    echo "[i] Installing zsh..."
-    sudo apt install zsh
-  fi
-  if [[ ! -d "$HOME/.oh-my-zsh" ]]
-  then
-    echo "[i] Installing oh-my-zsh..."
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  fi
-  if [[ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]]
-  then
-    echo "[i] Installing powerlevel10k theme..."
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-  fi 
-  if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]]
-  then
-    echo "[i] Adding zsh-autosuggestions plugin..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
-  fi 
-  if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]]
-  then  
-    echo "[i] Adding zsh-syntax-highlighting plugin..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-  fi 
-  echo "[i] Replacing zshrc file..."
-  echo "$(curl -fsSL https://raw.githubusercontent.com/Ralls0/dotfiles/main/.zshrc)" > $HOME/.zshrc
-  source $HOME/.zshrc
-}
-
 install_docker
 install_helm
 
@@ -106,10 +72,3 @@ case $env in
     exit 1
   ;;
 esac
-
-echo "Would you like to add the personal setup? [y/n]"
-read psetup
-if [[ "$psetup" -eq "y" || "$psetup" -eq "Y" || "$psetup" -eq "yes" ]]
-then
-  personal_setup
-fi
