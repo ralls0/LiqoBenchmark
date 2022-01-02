@@ -152,7 +152,8 @@ while [[ i -lt $# ]]; do
             fi
             echo "[i] Creating cluster $CLUSTER_NAME"
             sudo kind create cluster --name $CLUSTER_NAME --kubeconfig $HOME/.kube/liqo_${CLUSTER_NAME}_config
-            echo "alias liqo_${CLUSTER_NAME}_config=\"sudo export KUBECONFIG=$HOME/.kube/liqo_${CLUSTER_NAME}_config\"" >> $HOME/.zshrc
+            sudo chmod 644 $HOME/.kube/liqo_${CLUSTER_NAME}_config
+	    echo "alias liqo_${CLUSTER_NAME}_config=\"export KUBECONFIG=$HOME/.kube/liqo_${CLUSTER_NAME}_config\"" >> $HOME/.zshrc
             echo -e "[i] If you want to select $CLUSTER_NAME, you should simply type:\nsource \$HOME/.zshrc # once\nliqo_${CLUSTER_NAME}_config"
             echo "[i] Exporting KUBECONFIG"
             export KUBECONFIG=$HOME/.kube/liqo_${CLUSTER_NAME}_config
