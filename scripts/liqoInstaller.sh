@@ -119,14 +119,15 @@ while [[ i -lt $# ]]; do
       echo -e "[i] Load completions for each session"
       case $FVALUE in
         bash | BASH)
-          source <(liqoctl completion bash) >> ~/.bashrc
+          source <(liqoctl completion bash) >> $HOME/.bashrc
         ;; 
         zsh | ZSH)
           liqoctl completion zsh > "${fpath[1]}/_liqoctl"
-          source ~/.zshrc
+          source $HOME/.zshrc
         ;;
         fish | FISH)
-          liqoctl completion fish > ~/.config/fish/completions/liqoctl.fish               ;;
+          liqoctl completion fish > $HOME/.config/fish/completions/liqoctl.fish
+	;;
         pshell | powershell | POWERSHELL)
           liqoctl completion powershell > liqoctl.ps1
         ;;
