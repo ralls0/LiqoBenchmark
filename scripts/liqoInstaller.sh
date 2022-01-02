@@ -6,8 +6,8 @@ function helper(){
   echo -e "./liqoInstaller.sh [flags]\n"
   echo "Flags:"
   echo -e "  -cn,\t--cluster-name\t\t\tName of the cluster"
-  echo -e "  -cc,\t--command-completition\t\tInject liqoctl completion into the configuretion file"
-  echo -e "  -cp,\t--cluster-provider\t\tExport the KUBECONFIG file and install liqo into the cluster"
+  echo -e "  -cc,\t--command-completition\t\tInject liqoctl completion into the configuretion file. Possible values: zsh, bash, fish, pshell."
+  echo -e "  -cp,\t--cluster-provider\t\tExport the KUBECONFIG file and install liqo into the cluster. Possible values: kind, k8s."
   echo ""
  
 }
@@ -158,7 +158,7 @@ while [[ i -lt $# ]]; do
             echo "[i] Exporting KUBECONFIG"
             export KUBECONFIG=$HOME/.kube/liqo_${CLUSTER_NAME}_config
             echo "[i] Install liqo into the for the $CLUSTER_NAME cluster"
-            liqoctl install kind -n $CLUSTER_NAME
+            liqoctl install kind --cluster-name $CLUSTER_NAME
           else
             echo "[i] Retrieve configuration for the $CLUSTER_NAME cluster"
             kind get kubeconfig --name ${CLUSTER_NAME} > kind_kubeconfig
