@@ -6,8 +6,8 @@ function helper(){
   echo -e "./liqoInstaller.sh [flags]\n"
   echo "Flags:"
   echo -e "  -cn,\t--cluster-name\t\t\tName of the cluster"
-  echo -e "  -cc,\t--command-completition\t\tInject liqoctl completion into the configuretion file"
-  echo -e "  -cp,\t--cluster-provider\t\tExport the KUBECONFIG file and install liqo into the cluster"
+  echo -e "  -cc,\t--command-completition\t\tInject liqoctl completion into the configuretion file. Possible values: zsh, bash, fish, pshell."
+  echo -e "  -cp,\t--cluster-provider\t\tExport the KUBECONFIG file and install liqo into the cluster. Possible values: kind, k8s."
   echo ""
  
 }
@@ -119,14 +119,15 @@ while [[ i -lt $# ]]; do
       echo -e "[i] Load completions for each session"
       case $FVALUE in
         bash | BASH)
-          source <(liqoctl completion bash) >> ~/.bashrc
+          source <(liqoctl completion bash) >> $HOME/.bashrc
         ;; 
         zsh | ZSH)
           liqoctl completion zsh > "${fpath[1]}/_liqoctl"
-          source ~/.zshrc
+          source $HOME/.zshrc
         ;;
         fish | FISH)
-          liqoctl completion fish > ~/.config/fish/completions/liqoctl.fish               ;;
+          liqoctl completion fish > $HOME/.config/fish/completions/liqoctl.fish
+	;;
         pshell | powershell | POWERSHELL)
           liqoctl completion powershell > liqoctl.ps1
         ;;
@@ -151,12 +152,13 @@ while [[ i -lt $# ]]; do
             fi
             echo "[i] Creating cluster $CLUSTER_NAME"
             sudo kind create cluster --name $CLUSTER_NAME --kubeconfig $HOME/.kube/liqo_${CLUSTER_NAME}_config
-            echo "alias liqo_${CLUSTER_NAME}_config=\"sudo export KUBECONFIG=$HOME/.kube/liqo_${CLUSTER_NAME}_config\"" >> $HOME/.zshrc
+            sudo chmod 644 $HOME/.kube/liqo_${CLUSTER_NAME}_config
+	    echo "alias liqo_${CLUSTER_NAME}_config=\"export KUBECONFIG=$HOME/.kube/liqo_${CLUSTER_NAME}_config\"" >> $HOME/.zshrc
             echo -e "[i] If you want to select $CLUSTER_NAME, you should simply type:\nsource \$HOME/.zshrc # once\nliqo_${CLUSTER_NAME}_config"
             echo "[i] Exporting KUBECONFIG"
             export KUBECONFIG=$HOME/.kube/liqo_${CLUSTER_NAME}_config
             echo "[i] Install liqo into the for the $CLUSTER_NAME cluster"
-            liqoctl install kind -n $CLUSTER_NAME
+            liqoctl install kind --cluster-name $CLUSTER_NAME
           else
             echo "[i] Retrieve configuration for the $CLUSTER_NAME cluster"
             kind get kubeconfig --name ${CLUSTER_NAME} > kind_kubeconfig
