@@ -92,7 +92,7 @@ class WebsiteUserAddToCart(HttpUser):
 
     @task
     def checkout(self):
-        self.addToCart(1)
+        self.addToCart()
         self.client.post("/cart/checkout", {
             'email': 'someone@example.com',
             'street_address': '1600 Amphitheatre Parkway',
