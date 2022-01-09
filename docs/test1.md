@@ -40,6 +40,9 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/down
 
 where <version-number> is the Kubernetes Metrics Server version that you want to deploy. For example, v0.5.2.
 
+> NOTE: On the following upstream there is the version used in my test.
+>       [test manifest](https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/ral/setup/kubernetes-manifests/ms-components.yaml)
+
 2. Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
 
 ```bash
