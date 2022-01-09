@@ -21,7 +21,7 @@ import math
 def sinNorm(jump = 0.05):
   i = -1
   while i < 1:
-    yield math.sin(i)*10 if math.sin(i) >= 0 else (math.sin(i)*-1)*10
+    yield math.sin(i)/10 if math.sin(i) >= 0 else (math.sin(i)*-1)/10
     i = i+jump if i+jump < 1 else -1
 
 products = [
