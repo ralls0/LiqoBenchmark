@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: emailservice
@@ -16,20 +16,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: checkoutservice
@@ -47,20 +35,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: recommendationservice
@@ -78,20 +54,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: frontend
@@ -109,20 +73,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: paymentservice
@@ -140,20 +92,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: productcatalogservice
@@ -171,20 +111,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: cartservice
@@ -202,20 +130,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: currencyservice
@@ -233,20 +149,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: shippingservice
@@ -264,20 +168,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: redis-cart
@@ -295,20 +187,8 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: adservice
@@ -326,16 +206,4 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
-status:
-  observedGeneration: 1
-  lastScaleTime: <some-time>
-  currentReplicas: 1
-  desiredReplicas: 1
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
 ---
