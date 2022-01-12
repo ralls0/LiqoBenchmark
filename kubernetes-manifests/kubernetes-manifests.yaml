@@ -507,7 +507,7 @@ spec:
           value: "frontend:80"
       containers:
       - name: main
-        image: ralls0/loadgenerator:v0.0.9
+        image: ralls0/loadgenerator:v0.0.11
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"

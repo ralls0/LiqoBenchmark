@@ -36,4 +36,4 @@ COPY locustfile.py .
 # enable gevent support in debugger
 ENV GEVENT_SUPPORT=True
 
-ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u 5 -r 1 WebsiteUserIndex WebsiteUserSetCurrency WebsiteUserBrowseProduct WebsiteUserViewCart WebsiteUserAddToCart 2>&1
+ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u 100 -r 1 WebsiteUserIndex WebsiteUserSetCurrency WebsiteUserBrowseProduct WebsiteUserViewCart WebsiteUserAddToCart 2>&1
