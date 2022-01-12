@@ -382,10 +382,10 @@ spec:
           value: "3550"
         # - name: DISABLE_STATS
         #   value: "1"
-        # - name: DISABLE_TRACING
-        #   value: "1"
-        # - name: DISABLE_PROFILER
-        #   value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
+        - name: DISABLE_PROFILER
+          value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
         readinessProbe:
@@ -505,7 +505,7 @@ spec:
           value: "frontend:80"
       containers:
       - name: main
-        image: ralls0/loadgenerator:v0.0.7
+        image: ralls0/loadgenerator:v0.0.8
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"
@@ -599,8 +599,8 @@ spec:
         #   value: "1"
         # - name: DISABLE_TRACING
         #   value: "1"
-        # - name: DISABLE_PROFILER
-        #   value: "1"
+        - name: DISABLE_PROFILER
+          value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
         readinessProbe:
