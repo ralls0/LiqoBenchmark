@@ -39,8 +39,8 @@ spec:
         env:
         - name: PORT
           value: "8080"
-        # - name: DISABLE_TRACING
-        #   value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         readinessProbe:
@@ -330,6 +330,8 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
@@ -380,8 +382,8 @@ spec:
         env:
         - name: PORT
           value: "3550"
-        # - name: DISABLE_STATS
-        #   value: "1"
+        - name: DISABLE_STATS
+          value: "1"
         - name: DISABLE_TRACING
           value: "1"
         - name: DISABLE_PROFILER
@@ -540,8 +542,8 @@ spec:
         env:
         - name: PORT
           value: "7000"
-        # - name: DISABLE_TRACING
-        #   value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         - name: DISABLE_DEBUGGER
@@ -595,10 +597,10 @@ spec:
         env:
         - name: PORT
           value: "50051"
-        # - name: DISABLE_STATS
-        #   value: "1"
-        # - name: DISABLE_TRACING
-        #   value: "1"
+        - name: DISABLE_STATS
+          value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         # - name: JAEGER_SERVICE_ADDR
