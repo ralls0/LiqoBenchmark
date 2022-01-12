@@ -40,8 +40,6 @@ class WebsiteUserIndex(HttpUser):
     sinGen = sinNorm()
 
     def wait_time(self):
-        now = datetime.now()
-        print(f"[i] ({now}) Call wait_time")
         return next(self.sinGen)
 
     @task
