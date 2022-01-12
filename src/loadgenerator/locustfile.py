@@ -17,11 +17,12 @@
 import random
 from locust import HttpUser, task, between
 import math
+from datetime import datetime
 
 def sinNorm(jump = 0.05):
   i = -1
   while i < 1:
-    yield math.sin(i)/10 if math.sin(i) >= 0 else (math.sin(i)*-1)/10
+    yield math.sin(i)/10000 if math.sin(i) >= 0 else 1e-10
     i = i+jump if i+jump < 1 else -1
 
 products = [
@@ -39,6 +40,8 @@ class WebsiteUserIndex(HttpUser):
     sinGen = sinNorm()
 
     def wait_time(self):
+        now = datetime.now()
+        print(f"[i] ({now}) Call wait_time")
         return next(self.sinGen)
 
     @task
