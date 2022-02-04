@@ -21,10 +21,10 @@ from datetime import datetime
 
 def sinNorm(jump = 0.05):
   i = -1
-  timescaling = [10000, 100, 1]
+  timescaling = [10000, 1, 0.1]
   period = 0
   while i < 1:
-    yield math.sin(i)/timescaling[period] if math.sin(i) > 0 else 1e-10
+    yield math.sin(i)/timescaling[period] if math.sin(i) > 0 else 1e-5
     if i+jump < 1:
       i = i+jump
     else:
