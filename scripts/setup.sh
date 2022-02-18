@@ -1,0 +1,74 @@
+#!/bin/bash
+
+function install_helm(){
+  if ! command -v helm &> /dev/null
+  then
+    echo "[i] Installing helm..."
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
+  fi
+}
+
+function install_docker(){
+  if ! command -v docker &> /dev/null
+  then
+	  echo "[i] Installing docker..."
+	  sudo apt update
+    sudo apt install ca-certificates curl gnupg lsb-release
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt update
+    sudo apt install docker-ce docker-ce-cli containerd.io
+  fi
+}
+
+function install_kind(){
+  if ! command -v kind &> /dev/null
+  then
+    echo "[i] Installing kind..."
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
+    chmod +x ./kind
+    sudo mv ./kind /usr/bin/kind
+    echo "[i] Installing kubectl..."
+    sudo apt update
+    sudo apt install -y apt-transport-https ca-certificates
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+    sudo apt update
+    sudo apt install -y kubectl
+    sudo apt-mark hold kubectl
+  fi
+}
+
+function install_K8s(){
+  if ! command -v kubeadm &> /dev/null
+  then
+    echo "[i] Installing kubelet, kubeadm and kubectl..."
+    sudo apt update
+    sudo apt install -y apt-transport-https ca-certificates
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+    sudo apt update
+    sudo apt install -y kubelet kubeadm kubectl
+    sudo apt-mark hold kubelet kubeadm kubectl
+  fi
+}
+
+install_docker
+install_helm
+
+echo "Would you like to use kind or K8s? [kind/k8s]"
+read env
+case $env in
+  kind | Kind | KIND)
+    install_kind
+  ;;
+  k8s | K8s | K8S)
+    install_K8s
+  ;;
+  *)
+    echo "[e] Error $env environment unknown"
+    exit 1
+  ;;
+esac
