@@ -19,10 +19,10 @@ from locust import HttpUser, task, between
 import math
 from datetime import datetime
 
-def sinNorm(jump = 0.05):
-  i = -1
-  while i < 1:
-    yield 5 if math.sin(i) > 0 else 1e-10
+def sinNorm(jump = 0.01):
+  i = 0
+  while True:
+    yield 15 if math.sin(i) > 0 else 1e-10
     i = i+jump if i+jump < 1 else -1
 
 products = [
