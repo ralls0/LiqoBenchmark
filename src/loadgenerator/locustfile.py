@@ -20,9 +20,19 @@ import math
 from datetime import datetime
 
 def sinNorm():
+  mode = 0
+  cnt = 0
+  now = datetime.now()
+  p_time = now.minute
   while True:
     now = datetime.now()
-    yield 10 if (now.minute & 1) == 1 else 1e-10
+    if p_time < now.minute or p_time > now.minute:
+      cnt += 1
+      p_time = now.minute
+      if cnt//3 == 1:
+        cnt = 0
+        mode = 0 if mode == 1 else 1
+    yield 10 if mode == 0 else 1e-3
 
 products = [
     '0PUK6V6EV0',
