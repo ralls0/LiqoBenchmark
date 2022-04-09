@@ -1,10 +1,5 @@
 # Comandi utilizzati
 
-```bash
-
-
-```
-
 ## Addons
 
 ```bash
@@ -65,25 +60,27 @@ chmod 700 get_helm.sh
 ## Creazione clusters
 
 ```bash
-sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1
+sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC1
 echo "alias lc1=\"export KUBECONFIG=$HOME/.kube/configC1\"" >> $HOME/.bashrc
-sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2
+sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC2
 echo "alias lc2=\"export KUBECONFIG=$HOME/.kube/configC2\"" >> $HOME/.bashrc
-sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3
+sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC3
 echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
 source $HOME/.bashrc
 ```
 
 ```bash
-sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4
+sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC4
 echo "alias lc4=\"export KUBECONFIG=$HOME/.kube/configC4\"" >> $HOME/.bashrc
-sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5
+sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5  --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC5
 echo "alias lc5=\"export KUBECONFIG=$HOME/.kube/configC5\"" >> $HOME/.bashrc
+
+#########
 sudo kind create cluster --name cluster6 --kubeconfig $HOME/.kube/configC6
 sudo chmod 644 $HOME/.kube/configC6
 echo "alias lc6=\"export KUBECONFIG=$HOME/.kube/configC6\"" >> $HOME/.bashrc
@@ -122,5 +119,41 @@ lc2
 liqoctl install kind --cluster-name cluster2
 lc3
 liqoctl install kind --cluster-name cluster3
+lc2
+liqoctl generate-add-command
+lc3
+<output of liqoctl generate-add-command command>
+lc2
+k create ns online-boutique
+kubectl label namespace online-boutique liqo.io/enabled=true 
+k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/ral/setup/kubernetes-manifests/kubernetes-manifests.yaml -n online-boutique
+```
+
+## Test 3
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/scripts/liqoInstaller.sh > liqoInstaller
+chmod +x ./liqoInstaller
+./liqoInstaller
+source <(liqoctl completion bash) >> $HOME/.bashrc
+lc4
+# --chart-path=: il path del repo da cui prendere la versione
+liqoctl install kind --cluster-name cluster4 --version=8986c385adca13b476c4541ac03a5a6ccf38808d --chart-path=liqo/liqo/deployments/liqo
+lc5
+liqoctl install kind --cluster-name cluster5 --version=8986c385adca13b476c4541ac03a5a6ccf38808d --chart-path=liqo/liqo/deployments/liqo
+git clone https://github.com/Ralls0/linkerd2.git
+wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
+cd linkerd2
+git checkout ral/liqo-ipam
+# https://github.com/linkerd/linkerd2/blob/main/BUILD.md
+export PATH=$PWD/bin:$PATH
+linkerd version --client
+linkerd check --pre
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl $(which kubectl)
+linkerd check --pre
+
 
 ```
