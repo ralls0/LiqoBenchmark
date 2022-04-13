@@ -6,6 +6,8 @@
 # Install
 sudo apt update
 sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
 ```
 
 ## Docker
@@ -142,18 +144,24 @@ liqoctl install kind --cluster-name cluster4 --version=8986c385adca13b476c4541ac
 lc5
 liqoctl install kind --cluster-name cluster5 --version=8986c385adca13b476c4541ac03a5a6ccf38808d --chart-path=liqo/liqo/deployments/liqo
 git clone https://github.com/Ralls0/linkerd2.git
-wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
 cd linkerd2
 git checkout ral/liqo-ipam
 # https://github.com/linkerd/linkerd2/blob/main/BUILD.md
 export PATH=$PWD/bin:$PATH
 linkerd version --client
 linkerd check --pre
-curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl
+# In caso di problemi di kubectl version
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.0/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl $(which kubectl)
 linkerd check --pre
-
+###
+linkerd install | kubectl apply -f -
+linkerd check
+# cambiare le image dei container da cr.l5d.io/linkerd a ghcr.io/ralls0/linkerd2
+# aggiunto:
+           initialDelaySeconds: 300
+#          periodSeconds: 30
+# dopo readinessProbe e livenessProbe
 
 ```
