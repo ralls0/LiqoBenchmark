@@ -61,6 +61,17 @@ chmod 700 get_helm.sh
 
 ## Creazione clusters
 
+> --config al posto di --image
+> sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --config ./kind-manifest.yaml
+
+
+> docker eseguire:
+> docker exec -it <nomeContainer> bash
+> iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
+
+> liqoctl offload namespace linkerd --pod-offloading-strategy=Local --namespace-mapping-strategy=EnforceSameName
+> liqoctl offload namespace onlineboutique --namespace-mapping-strategy=EnforceSameName
+
 ```bash
 sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC1
