@@ -5,7 +5,7 @@
 ```bash
 # Install
 sudo apt update
-sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release jq
 wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
 ```
@@ -61,17 +61,6 @@ chmod 700 get_helm.sh
 
 ## Creazione clusters
 
-> --config al posto di --image
-> sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --config ./kind-manifest.yaml
-
-
-> docker eseguire:
-> docker exec -it <nomeContainer> bash
-> iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
-
-> liqoctl offload namespace linkerd --pod-offloading-strategy=Local --namespace-mapping-strategy=EnforceSameName
-> liqoctl offload namespace onlineboutique --namespace-mapping-strategy=EnforceSameName
-
 ```bash
 sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC1
@@ -86,10 +75,10 @@ source $HOME/.bashrc
 ```
 
 ```bash
-sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --image kindest/node:v1.23.5
+sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kind-manifestc4.yaml
 sudo chmod 644 $HOME/.kube/configC4
 echo "alias lc4=\"export KUBECONFIG=$HOME/.kube/configC4\"" >> $HOME/.bashrc
-sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5  --image kindest/node:v1.23.5
+sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5 --config ./kind-manifestc5.yaml # uguale ma con ip diversi
 sudo chmod 644 $HOME/.kube/configC5
 echo "alias lc5=\"export KUBECONFIG=$HOME/.kube/configC5\"" >> $HOME/.bashrc
 
@@ -100,15 +89,12 @@ echo "alias lc6=\"export KUBECONFIG=$HOME/.kube/configC6\"" >> $HOME/.bashrc
 source $HOME/.bashrc
 ```
 
-## Clone Linkerd
+## Clone Linkerd (old)
 
 ```bash
 git clone https://github.com/Ralls0/linkerd2.git
 cd linkerd2
 git checkout ral/liqo-ipam
-sudo apt install -y jq
-cd bin
-./fetch-proxy
 ```
 
 ## Test 1
@@ -149,11 +135,34 @@ curl -fsSL https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/scripts/l
 chmod +x ./liqoInstaller
 ./liqoInstaller
 source <(liqoctl completion bash) >> $HOME/.bashrc
+sudo docker exec -it 91ba37fd1e3b bash
+iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.20.0.0/16 -j RETURN
+sudo docker exec -it fc19a0d39c38 bash
+iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
 lc4
-# --chart-path=: il path del repo da cui prendere la versione
-liqoctl install kind --cluster-name cluster4 --version=8986c385adca13b476c4541ac03a5a6ccf38808d --chart-path=liqo/liqo/deployments/liqo
+liqoctl install kind --cluster-name cluster4 --version=c169957721e85290aa19e0fefce4b5961538d532 --repo-url=https://github.com/giorio94/liqo
 lc5
-liqoctl install kind --cluster-name cluster5 --version=8986c385adca13b476c4541ac03a5a6ccf38808d --chart-path=liqo/liqo/deployments/liqo
+liqoctl install kind --cluster-name cluster5 --version=c169957721e85290aa19e0fefce4b5961538d532 --repo-url=https://github.com/giorio94/liqo
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
+export PATH=$PATH:/home/crownlabs/.linkerd2/bin
+linkerd check --pre
+lc4
+linkerd install | kubectl apply -f -
+linkerd check
+liqoctl offload namespace linkerd --pod-offloading-strategy=Local --namespace-mapping-strategy=EnforceSameName
+kubectl create ns online-boutique
+liqoctl offload namespace online-boutique --namespace-mapping-strategy=EnforceSameName
+curl -fsSL https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/ral/setup/kubernetes-manifests/kubernetes-manifests.yaml | linkerd inject - | kubectl -n online-boutique apply -f -
+linkerd -n online-boutique check --proxy
+linkerd viz install | kubectl apply -f -
+linkerd check
+linkerd viz dashboard &
+## k port-forward -n online-boutique svc/frontend-external 8080:80
+```
+
+### Old steps
+
+```bash
 git clone https://github.com/Ralls0/linkerd2.git
 cd linkerd2
 git checkout ral/liqo-ipam
@@ -174,5 +183,4 @@ linkerd check
            initialDelaySeconds: 300
 #          periodSeconds: 30
 # dopo readinessProbe e livenessProbe
-
 ```
