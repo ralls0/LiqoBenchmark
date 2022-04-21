@@ -159,6 +159,10 @@ liqoctl offload namespace online-boutique --namespace-mapping-strategy=EnforceSa
 curl -fsSL https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifests.yaml | linkerd inject - | kubectl -n online-boutique apply -f -
 linkerd -n online-boutique check --proxy
 k port-forward -n online-boutique svc/frontend-external 8080:80 --address=0.0.0.0
+# oppure senza il flag --address ma con le seguenti regole:
+# sudo ufw allow 8080
+# sudo sysctl net.ipv4.ip_forward=1 
+# sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 127.0.0.1:8080
 linkerd viz install | kubectl apply -f -
 linkerd check
 linkerd viz dashboard &
