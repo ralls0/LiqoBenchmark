@@ -103,7 +103,7 @@ git checkout ral/liqo-ipam
 lc1
 k create ns online-boutique
 k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/ms-components.yaml
-k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/ral/setup/kubernetes-manifests/kubernetes-manifests.yaml -n online-boutique
+k apply -f https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifests.yaml -n online-boutique
 k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa-manifest.yaml
 ```
 
@@ -125,7 +125,7 @@ lc3
 lc2
 k create ns online-boutique
 kubectl label namespace online-boutique liqo.io/enabled=true 
-k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/ral/setup/kubernetes-manifests/kubernetes-manifests.yaml -n online-boutique
+k apply -f https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifests.yaml -n online-boutique
 ```
 
 ## Test 3
@@ -137,7 +137,11 @@ chmod +x ./liqoInstaller
 source <(liqoctl completion bash) >> $HOME/.bashrc
 sudo docker exec -it 91ba37fd1e3b bash
 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.20.0.0/16 -j RETURN
+sudo docker exec -it a9e6f3769054 bash
+iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.20.0.0/16 -j RETURN
 sudo docker exec -it fc19a0d39c38 bash
+iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
+sudo docker exec -it 51f9ef8f339b bash
 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
 lc4
 liqoctl install kind --cluster-name cluster4 --version=c169957721e85290aa19e0fefce4b5961538d532 --repo-url=https://github.com/giorio94/liqo
@@ -152,12 +156,18 @@ linkerd check
 liqoctl offload namespace linkerd --pod-offloading-strategy=Local --namespace-mapping-strategy=EnforceSameName
 kubectl create ns online-boutique
 liqoctl offload namespace online-boutique --namespace-mapping-strategy=EnforceSameName
-curl -fsSL https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/ral/setup/kubernetes-manifests/kubernetes-manifests.yaml | linkerd inject - | kubectl -n online-boutique apply -f -
+curl -fsSL https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifests.yaml | linkerd inject - | kubectl -n online-boutique apply -f -
 linkerd -n online-boutique check --proxy
+k port-forward -n online-boutique svc/frontend-external 8080:80 --address=0.0.0.0
 linkerd viz install | kubectl apply -f -
 linkerd check
 linkerd viz dashboard &
-## k port-forward -n online-boutique svc/frontend-external 8080:80
+# In caso non funzioni e si deve accedere alla dashboard da un'altra VM:
+# 1. Bisognava modificare un args come indicato [qui](https://linkerd.io/2.11/tasks/exposing-dashboard/#tweaking-host-requirement)
+# 2. Aprimao la prota 50750 e mandiamo il traffico sulla porta indicata:
+# sudo ufw allow 50750
+# sudo sysctl net.ipv4.ip_forward=1 
+# sudo iptables -t nat -A PREROUTING -p tcp --dport 50750 -j DNAT --to-destination 127.0.0.1:50750
 ```
 
 ### Old steps
