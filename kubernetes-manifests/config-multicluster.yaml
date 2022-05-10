@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Config
+preferences: {}
+
+clusters:
+- cluster:
+    certificate-authority-data: <CA>
+    server: https://127.0.0.1:38663
+  name: kind-cluster6
+- cluster:
+    certificate-authority-data: <CA>
+    server: https://127.0.0.1:38139
+  name: kind-cluster7
+
+users:
+- name: kind-cluster7
+  user:
+    client-certificate-data: <cert>
+    client-key-data: <key>
+- name: kind-cluster6
+  user:
+    client-certificate-data: <cert>
+    client-key-data: <key>
+
+contexts:
+- context:
+    cluster: kind-cluster6
+    user: kind-cluster6
+  name: kind-cluster6
+- context:
+    cluster: kind-cluster7
+    user: kind-cluster7
+  name: kind-cluster7

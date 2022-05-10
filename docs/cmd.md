@@ -102,8 +102,11 @@ sudo chmod 644 $HOME/.kube/configC6
 echo "alias lc6=\"export KUBECONFIG=$HOME/.kube/configC6\"" >> $HOME/.bashrc
 
 sudo kind create cluster --name cluster7 --kubeconfig $HOME/.kube/configC7
-sudo chmod 644 $HOME/.kube/configC6
+sudo chmod 644 $HOME/.kube/configC7
 echo "alias lc7=\"export KUBECONFIG=$HOME/.kube/configC7\"" >> $HOME/.bashrc
+
+curl -fsSL -o $HOME/.kube/config-multicluster.yaml 
+
 source $HOME/.bashrc
 ```
 
@@ -194,6 +197,11 @@ linkerd viz dashboard &
 ```
 
 ## Test 4
+
+```bash
+# Modificare il file config-multicluster con i valori presenti in $HOME/.kube/configC6 e $HOME/.kube/configC7
+
+```
 
 ### Old steps
 
