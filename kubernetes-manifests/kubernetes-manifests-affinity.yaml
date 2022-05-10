@@ -29,6 +29,15 @@ spec:
       labels:
         app: emailservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: NotIn
+                values:
+                - virtual-node
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
@@ -84,6 +93,15 @@ spec:
       labels:
         app: checkoutservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: In
+                values:
+                - virtual-node
       containers:
         - name: server
           image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.3.3
@@ -152,6 +170,15 @@ spec:
       labels:
         app: recommendationservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: NotIn
+                values:
+                - virtual-node
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
@@ -213,6 +240,15 @@ spec:
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
+      affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: liqo.io/type
+                  operator: NotIn
+                  values:
+                  - virtual-node
       containers:
         - name: server
           image: liqo/frontend-ci:v0.3.4
@@ -312,6 +348,15 @@ spec:
       labels:
         app: paymentservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: In
+                values:
+                - virtual-node
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
@@ -367,6 +412,15 @@ spec:
       labels:
         app: productcatalogservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: NotIn
+                values:
+                - virtual-node
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
@@ -424,6 +478,15 @@ spec:
       labels:
         app: cartservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: In
+                values:
+                - virtual-node
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
@@ -522,6 +585,15 @@ spec:
       labels:
         app: currencyservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: NotIn
+                values:
+                - virtual-node
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
@@ -578,6 +650,15 @@ spec:
       labels:
         app: shippingservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: In
+                values:
+                - virtual-node
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/shippingservice:v0.3.4
@@ -635,6 +716,15 @@ spec:
       labels:
         app: redis-cart
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: NotIn
+                values:
+                - virtual-node
       containers:
       - name: redis
         image: redis:alpine
@@ -688,6 +778,15 @@ spec:
       labels:
         app: adservice
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: liqo.io/type
+                operator: In
+                values:
+                - virtual-node
       terminationGracePeriodSeconds: 5
       containers:
       - name: server

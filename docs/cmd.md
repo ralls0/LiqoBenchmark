@@ -59,18 +59,32 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 ```
 
+## Linkerd
+
+```bash
+# Check
+command -v linkerd
+
+# Install
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
+export PATH=$PATH:$HOME/.linkerd2/bin
+```
+
 ## Creazione clusters
 
 ```bash
 sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC1
 echo "alias lc1=\"export KUBECONFIG=$HOME/.kube/configC1\"" >> $HOME/.bashrc
+
 sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC2
 echo "alias lc2=\"export KUBECONFIG=$HOME/.kube/configC2\"" >> $HOME/.bashrc
+
 sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC3
 echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
+
 source $HOME/.bashrc
 ```
 
@@ -78,14 +92,18 @@ source $HOME/.bashrc
 sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kind-manifestc4.yaml
 sudo chmod 644 $HOME/.kube/configC4
 echo "alias lc4=\"export KUBECONFIG=$HOME/.kube/configC4\"" >> $HOME/.bashrc
+
 sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5 --config ./kind-manifestc5.yaml # uguale ma con ip diversi
 sudo chmod 644 $HOME/.kube/configC5
 echo "alias lc5=\"export KUBECONFIG=$HOME/.kube/configC5\"" >> $HOME/.bashrc
 
-#########
 sudo kind create cluster --name cluster6 --kubeconfig $HOME/.kube/configC6
 sudo chmod 644 $HOME/.kube/configC6
 echo "alias lc6=\"export KUBECONFIG=$HOME/.kube/configC6\"" >> $HOME/.bashrc
+
+sudo kind create cluster --name cluster7 --kubeconfig $HOME/.kube/configC7
+sudo chmod 644 $HOME/.kube/configC6
+echo "alias lc7=\"export KUBECONFIG=$HOME/.kube/configC7\"" >> $HOME/.bashrc
 source $HOME/.bashrc
 ```
 
@@ -172,7 +190,10 @@ linkerd viz dashboard &
 # sudo ufw allow 50750
 # sudo sysctl net.ipv4.ip_forward=1 
 # sudo iptables -t nat -A PREROUTING -p tcp --dport 50750 -j DNAT --to-destination 127.0.0.1:50750
+
 ```
+
+## Test 4
 
 ### Old steps
 
