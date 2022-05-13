@@ -214,6 +214,42 @@ step certificate create root.linkerd.cluster.local root.crt root.key --profile r
 step certificate create identity.linkerd.cluster.local issuer.crt issuer.key \
   --profile intermediate-ca --not-after 8760h --no-password --insecure \
   --ca root.crt --ca-key root.key
+# Installazione metallb
+kubectl --context=west apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+kubectl --context=west apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+docker network inspect -f '{{.IPAM.Config}}' kind
+# Guardiamo il range di valori dati e lo inseriamo dopo
+k --context=west apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 172.18.255.200-172.18.255.225 # da modificare con il valore letto prima
+EOF
+# Installazione metallb
+kubectl --context=east apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+kubectl --context=east apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+k --context=east apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 172.18.255.225-172.18.255.250 # da modificare con il valore letto prima
+EOF
 # Installiamo linkerd nei due cluster
 linkerd install \
   --identity-trust-anchors-file root.crt \
@@ -240,14 +276,14 @@ done
 #     rollout status deploy/linkerd-gateway || break
 #   echo "-------------"
 # done
-# for ctx in west east; do
-#   printf "Checking cluster: ${ctx} ........."
-#   while [ "$(kubectl --context=${ctx} -n linkerd-multicluster get service -o 'custom-columns=:.status.loadBalancer.ingress[0].ip' --no-headers)" = "<none>" ]; do
-#       printf '.'
-#       sleep 1
-#   done
-#   printf "\n"
-# done
+for ctx in west east; do
+  printf "Checking cluster: ${ctx} ........."
+  while [ "$(kubectl --context=${ctx} -n linkerd-multicluster get service -o 'custom-columns=:.status.loadBalancer.ingress[0].ip' --no-headers)" = "<none>" ]; do
+      printf '.'
+      sleep 1
+  done
+  printf "\n"
+done
 ```
 
 ### Old steps
