@@ -6,8 +6,12 @@
 # Install
 sudo apt update
 sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release jq
+# Goland
 wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
+# Step
+wget https://dl.step.sm/gh-release/cli/docs-cli-install/v0.19.0/step-cli_0.19.0_amd64.deb
+sudo dpkg -i step-cli_0.19.0_amd64.deb
 ```
 
 ## Docker
@@ -105,7 +109,9 @@ sudo kind create cluster --name cluster7 --kubeconfig $HOME/.kube/configC7
 sudo chmod 644 $HOME/.kube/configC7
 echo "alias lc7=\"export KUBECONFIG=$HOME/.kube/configC7\"" >> $HOME/.bashrc
 
-curl -fsSL -o $HOME/.kube/config-multicluster.yaml 
+curl -fsSL -o $HOME/.kube/config-multicluster https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/config-multicluster.yaml
+sudo chmod 644 $HOME/.kube/config-multicluster
+echo "alias lmc=\"export KUBECONFIG=$HOME/.kube/config-multicluster\"" >> $HOME/.bashrc
 
 source $HOME/.bashrc
 ```
@@ -200,7 +206,48 @@ linkerd viz dashboard &
 
 ```bash
 # Modificare il file config-multicluster con i valori presenti in $HOME/.kube/configC6 e $HOME/.kube/configC7
-
+sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster6 west
+sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster7 east
+# Creiamo il trust anchor in modo che linkerd si interfacci tra i due cluster
+step certificate create root.linkerd.cluster.local root.crt root.key --profile root-ca --no-password --insecure
+# Creiamo le issuer credentials
+step certificate create identity.linkerd.cluster.local issuer.crt issuer.key \
+  --profile intermediate-ca --not-after 8760h --no-password --insecure \
+  --ca root.crt --ca-key root.key
+# Installiamo linkerd nei due cluster
+linkerd install \
+  --identity-trust-anchors-file root.crt \
+  --identity-issuer-certificate-file issuer.crt \
+  --identity-issuer-key-file issuer.key \
+  | tee \
+    >(kubectl --context=west apply -f -) \
+    >(kubectl --context=east apply -f -)
+for ctx in west east; do
+  linkerd --context=${ctx} viz install | \
+    kubectl --context=${ctx} apply -f - || break
+done
+# Installazione dei componenti multicluster: Gateway, Service Mirror Service Account
+for ctx in west east; do
+  echo "Installing on cluster: ${ctx} ........."
+  linkerd --context=${ctx} multicluster install | \
+    kubectl --context=${ctx} apply -f - || break
+  echo "-------------"
+done
+# Controllo che il gateway funzioni:
+# for ctx in west east; do
+#   echo "Checking gateway on cluster: ${ctx} ........."
+#   kubectl --context=${ctx} -n linkerd-multicluster \
+#     rollout status deploy/linkerd-gateway || break
+#   echo "-------------"
+# done
+# for ctx in west east; do
+#   printf "Checking cluster: ${ctx} ........."
+#   while [ "$(kubectl --context=${ctx} -n linkerd-multicluster get service -o 'custom-columns=:.status.loadBalancer.ingress[0].ip' --no-headers)" = "<none>" ]; do
+#       printf '.'
+#       sleep 1
+#   done
+#   printf "\n"
+# done
 ```
 
 ### Old steps

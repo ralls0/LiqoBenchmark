@@ -31,3 +31,5 @@ contexts:
     cluster: kind-cluster7
     user: kind-cluster7
   name: kind-cluster7
+
+current-context: kind-cluster6
