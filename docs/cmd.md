@@ -1,5 +1,30 @@
 # Comandi utilizzati
 
+## Old steps
+
+```bash
+git clone https://github.com/Ralls0/linkerd2.git
+cd linkerd2
+git checkout ral/liqo-ipam
+# https://github.com/linkerd/linkerd2/blob/main/BUILD.md
+export PATH=$PWD/bin:$PATH
+linkerd version --client
+linkerd check --pre
+# In caso di problemi di kubectl version
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.0/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl $(which kubectl)
+linkerd check --pre
+###
+linkerd install | kubectl apply -f -
+linkerd check
+# cambiare le image dei container da cr.l5d.io/linkerd a ghcr.io/ralls0/linkerd2
+# aggiunto:
+           initialDelaySeconds: 300
+#          periodSeconds: 30
+# dopo readinessProbe e livenessProbe
+```
+
 ## Addons
 
 ```bash
@@ -231,7 +256,7 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 172.18.255.200-172.18.255.225 # da modificare con il valore letto prima
+      - 172.18.1.1-172.18.1.255 # da modificare con il valore letto prima
 EOF
 # Installazione metallb
 kubectl --context=east apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
@@ -248,8 +273,21 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 172.18.255.225-172.18.255.250 # da modificare con il valore letto prima
+      - 172.18.2.1-172.18.2.255 # da modificare con il valore letto prima
 EOF
+# controllo che i due cluster comunichino
+k --context=west apply -f https://raw.githubusercontent.com/inlets/inlets-operator/master/contrib/nginx-sample-deployment.yaml
+k --context=east apply -f https://raw.githubusercontent.com/inlets/inlets-operator/master/contrib/nginx-sample-deployment.yaml
+kubectl --context=west expose deployment nginx-1 --port=80 --type=LoadBalancer
+kubectl --context=east expose deployment nginx-1 --port=80 --type=LoadBalancer
+kubectl --context=west exec --stdin --tty nginx-1-<N>-<N> -- /bin/bash
+apt-get update
+apt install curl
+curl <ip>
+kubectl --context=east exec --stdin --tty nginx-1-<N>-<N> -- /bin/bash
+apt-get update
+apt install curl
+curl <ip>
 # Installiamo linkerd nei due cluster
 linkerd install \
   --identity-trust-anchors-file root.crt \
@@ -270,12 +308,12 @@ for ctx in west east; do
   echo "-------------"
 done
 # Controllo che il gateway funzioni:
-# for ctx in west east; do
-#   echo "Checking gateway on cluster: ${ctx} ........."
-#   kubectl --context=${ctx} -n linkerd-multicluster \
-#     rollout status deploy/linkerd-gateway || break
-#   echo "-------------"
-# done
+for ctx in west east; do
+  echo "Checking gateway on cluster: ${ctx} ........."
+  kubectl --context=${ctx} -n linkerd-multicluster \
+    rollout status deploy/linkerd-gateway || break
+  echo "-------------"
+done
 for ctx in west east; do
   printf "Checking cluster: ${ctx} ........."
   while [ "$(kubectl --context=${ctx} -n linkerd-multicluster get service -o 'custom-columns=:.status.loadBalancer.ingress[0].ip' --no-headers)" = "<none>" ]; do
@@ -284,29 +322,36 @@ for ctx in west east; do
   done
   printf "\n"
 done
+linkerd --context=east multicluster link --cluster-name east |
+  kubectl --context=west apply -f -
+# Controllo link multicluster
+linkerd --context=west multicluster check
+# In caso di problemi `all gateway mirrors are healthy`:
+# Ricavare l'API Server Ip:
+# kubectl --context=east proxy --port=8080 &
+# curl http://localhost:8080/api/
+# kill -9 %%
+# linkerd --context=east multicluster link --cluster-name east --api-server-address="https://<IP>:<PORT>"| kubectl --context=west apply -f -
+linkerd --context=west multicluster gateways
 ```
 
-### Old steps
+## Unistall Linkerd
 
 ```bash
-git clone https://github.com/Ralls0/linkerd2.git
-cd linkerd2
-git checkout ral/liqo-ipam
-# https://github.com/linkerd/linkerd2/blob/main/BUILD.md
-export PATH=$PWD/bin:$PATH
-linkerd version --client
-linkerd check --pre
-# In caso di problemi di kubectl version
-curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.0/bin/linux/amd64/kubectl
-chmod +x ./kubectl
-sudo mv ./kubectl $(which kubectl)
-linkerd check --pre
-###
-linkerd install | kubectl apply -f -
-linkerd check
-# cambiare le image dei container da cr.l5d.io/linkerd a ghcr.io/ralls0/linkerd2
-# aggiunto:
-           initialDelaySeconds: 300
-#          periodSeconds: 30
-# dopo readinessProbe e livenessProbe
+linkerd viz uninstall | tee \
+    >(kubectl --context=west delete -f -) \
+    >(kubectl --context=east delete -f -)
+
+linkerd multicluster unlink --cluster-name=target | kubectl delete -f -
+
+linkerd multicluster uninstall | tee \
+    >(kubectl --context=west delete -f -) \
+    >(kubectl --context=east delete -f -)
+
+
+linkerd uninstall | tee \
+    >(kubectl --context=west delete -f -) \
+    >(kubectl --context=east delete -f -)
 ```
+
+linkerd --context=east multicluster link --cluster-name east --api-server-address="https://172.18.0.3:6443"| kubectl --context=west apply -f -
