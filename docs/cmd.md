@@ -322,8 +322,8 @@ for ctx in west east; do
   done
   printf "\n"
 done
-linkerd --context=east multicluster link --cluster-name east |
-  kubectl --context=west apply -f -
+linkerd --context=east multicluster link --cluster-name east | kubectl --context=west apply -f -
+linkerd --context=west multicluster link --cluster-name west | kubectl --context=east apply -f -
 # Controllo link multicluster
 linkerd --context=west multicluster check
 # In caso di problemi `all gateway mirrors are healthy`:
@@ -337,7 +337,13 @@ k --context=west create ns online-boutique
 k --context=east create ns online-boutique
 k --context=west label ns online-boutique linkerd.io/inject=enabled
 k --context=east label ns online-boutique linkerd.io/inject=enabled
-curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifest-exported.yaml | linkerd inject - | k -n online-boutique apply -f -
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
+# Controlloe ndpoint mirrored
+k --context=west -n online-boutique exec -c server -it \
+  $(k --context=west -n online-boutique get po -l app=frontend \
+    --no-headers -o custom-columns=:.metadata.name) \
+  -- /bin/sh -c "apk add curl && curl http://shippingservice-east:50051"
 ```
 
 ## Unistall Linkerd
