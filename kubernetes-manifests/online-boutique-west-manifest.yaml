@@ -62,6 +62,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: emailservice
+  labels:
+    mirror.linkerd.io/exported: "true"
 spec:
   type: ClusterIP
   selector:
@@ -70,77 +72,6 @@ spec:
   - name: grpc
     port: 5000
     targetPort: 8080
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: checkoutservice
-spec:
-  selector:
-    matchLabels:
-      app: checkoutservice
-  template:
-    metadata:
-      labels:
-        app: checkoutservice
-        mirror.linkerd.io/exported: "true"
-    spec:
-      containers:
-        - name: server
-          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.3.3
-          ports:
-          - containerPort: 5050
-          readinessProbe:
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:5050"]
-          livenessProbe:
-            exec:
-              command: ["/bin/grpc_health_probe", "-addr=:5050"]
-          env:
-          - name: PORT
-            value: "5050"
-          - name: PRODUCT_CATALOG_SERVICE_ADDR
-            value: "productcatalogservice:3550"
-          - name: SHIPPING_SERVICE_ADDR
-            value: "shippingservice:50051"
-          - name: PAYMENT_SERVICE_ADDR
-            value: "paymentservice:50051"
-          - name: EMAIL_SERVICE_ADDR
-            value: "emailservice:5000"
-          - name: CURRENCY_SERVICE_ADDR
-            value: "currencyservice:7000"
-          - name: CART_SERVICE_ADDR
-            value: "cartservice:7070"
-          - name: DISABLE_STATS
-            value: "1"
-          - name: DISABLE_TRACING
-            value: "1"
-          - name: DISABLE_PROFILER
-            value: "1"
-          # - name: JAEGER_SERVICE_ADDR
-          #   value: "jaeger-collector:14268"
-          resources:
-            requests:
-              cpu: 100m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 128Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: checkoutservice
-  labels:
-    mirror.linkerd.io/exported: "true"
-spec:
-  type: ClusterIP
-  selector:
-    app: checkoutservice
-  ports:
-  - name: grpc
-    port: 5050
-    targetPort: 5050
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -192,6 +123,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: recommendationservice
+  labels:
+    mirror.linkerd.io/exported: "true"
 spec:
   type: ClusterIP
   selector:
@@ -280,6 +213,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend
+  labels:
+    mirror.linkerd.io/exported: "true"
 spec:
   type: ClusterIP
   selector:
@@ -293,6 +228,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend-external
+  labels:
+    mirror.linkerd.io/exported: "true"
 spec:
   type: LoadBalancer
   selector:
@@ -301,64 +238,6 @@ spec:
   - name: http
     port: 80
     targetPort: 8080
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: paymentservice
-spec:
-  selector:
-    matchLabels:
-      app: paymentservice
-  template:
-    metadata:
-      labels:
-        app: paymentservice
-        mirror.linkerd.io/exported: "true"
-    spec:
-      terminationGracePeriodSeconds: 5
-      containers:
-      - name: server
-        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.3.0
-        ports:
-        - containerPort: 50051
-        env:
-        - name: PORT
-          value: "50051"
-        - name: DISABLE_PROFILER
-          value: "1"
-        # - name: DISABLE_DEBUGGER
-        #   value: "1"
-        # - name: DISABLE_TRACING
-        #   value: "1"
-        readinessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        livenessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64Mi
-          limits:
-            cpu: 200m
-            memory: 128Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: paymentservice
-  labels:
-    mirror.linkerd.io/exported: "true"
-spec:
-  type: ClusterIP
-  selector:
-    app: paymentservice
-  ports:
-  - name: grpc
-    port: 50051
-    targetPort: 50051
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -408,6 +287,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: productcatalogservice
+  labels:
+    mirror.linkerd.io/exported: "true"
 spec:
   type: ClusterIP
   selector:
@@ -416,61 +297,6 @@ spec:
   - name: grpc
     port: 3550
     targetPort: 3550
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: cartservice
-spec:
-  selector:
-    matchLabels:
-      app: cartservice
-  template:
-    metadata:
-      labels:
-        app: cartservice
-        mirror.linkerd.io/exported: "true"
-    spec:
-      terminationGracePeriodSeconds: 5
-      containers:
-      - name: server
-        image: gcr.io/google-samples/microservices-demo/cartservice:v0.3.4
-        ports:
-        - containerPort: 7070
-        env:
-        - name: REDIS_ADDR
-          value: "redis-cart:6379"
-        resources:
-          requests:
-            cpu: 200m
-            memory: 64Mi
-          limits:
-            cpu: 300m
-            memory: 128Mi
-        readinessProbe:
-          initialDelaySeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
-        livenessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cartservice
-  labels:
-    mirror.linkerd.io/exported: "true"
-spec:
-  type: ClusterIP
-  selector:
-    app: cartservice
-  ports:
-  - name: grpc
-    port: 7070
-    targetPort: 7070
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -565,6 +391,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: currencyservice
+  labels:
+    mirror.linkerd.io/exported: "true"
 spec:
   type: ClusterIP
   selector:
@@ -573,66 +401,6 @@ spec:
   - name: grpc
     port: 7000
     targetPort: 7000
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: shippingservice
-spec:
-  selector:
-    matchLabels:
-      app: shippingservice
-  template:
-    metadata:
-      labels:
-        app: shippingservice
-        mirror.linkerd.io/exported: "true"
-    spec:
-      containers:
-      - name: server
-        image: gcr.io/google-samples/microservices-demo/shippingservice:v0.3.4
-        ports:
-        - containerPort: 50051
-        env:
-        - name: PORT
-          value: "50051"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
-        - name: DISABLE_PROFILER
-          value: "1"
-        # - name: JAEGER_SERVICE_ADDR
-        #   value: "jaeger-collector:14268"
-        readinessProbe:
-          periodSeconds: 5
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        livenessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64Mi
-          limits:
-            cpu: 200m
-            memory: 128Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: shippingservice
-  labels:
-    mirror.linkerd.io/exported: "true"
-spec:
-  type: ClusterIP
-  selector:
-    app: shippingservice
-  ports:
-  - name: grpc
-    port: 50051
-    targetPort: 50051
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -678,6 +446,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-cart
+  labels:
+    mirror.linkerd.io/exported: "true"
 spec:
   type: ClusterIP
   selector:
@@ -686,66 +456,4 @@ spec:
   - name: redis
     port: 6379
     targetPort: 6379
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: adservice
-spec:
-  selector:
-    matchLabels:
-      app: adservice
-  template:
-    metadata:
-      labels:
-        app: adservice
-        mirror.linkerd.io/exported: "true"
-    spec:
-      terminationGracePeriodSeconds: 5
-      containers:
-      - name: server
-        image: gcr.io/google-samples/microservices-demo/adservice:v0.3.4
-        ports:
-        - containerPort: 9555
-        env:
-        - name: PORT
-          value: "9555"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
-        # - name: JAEGER_SERVICE_ADDR
-        #   value: "jaeger-collector:14268"
-        resources:
-          requests:
-            cpu: 200m
-            memory: 180Mi
-          limits:
-            cpu: 300m
-            memory: 300Mi
-        readinessProbe:
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:9555"]
-        livenessProbe:
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:9555"]
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: adservice
-  labels:
-    mirror.linkerd.io/exported: "true"
-spec:
-  type: ClusterIP
-  selector:
-    app: adservice
-  ports:
-  - name: grpc
-    port: 9555
-    targetPort: 9555
 ---

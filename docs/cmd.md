@@ -333,6 +333,11 @@ linkerd --context=west multicluster check
 # kill -9 %%
 # linkerd --context=east multicluster link --cluster-name east --api-server-address="https://<IP>:<PORT>"| kubectl --context=west apply -f -
 linkerd --context=west multicluster gateways
+k --context=west create ns online-boutique
+k --context=east create ns online-boutique
+k --context=west label ns online-boutique linkerd.io/inject=enabled
+k --context=east label ns online-boutique linkerd.io/inject=enabled
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifest-exported.yaml | linkerd inject - | k -n online-boutique apply -f -
 ```
 
 ## Unistall Linkerd
@@ -353,5 +358,3 @@ linkerd uninstall | tee \
     >(kubectl --context=west delete -f -) \
     >(kubectl --context=east delete -f -)
 ```
-
-linkerd --context=east multicluster link --cluster-name east --api-server-address="https://172.18.0.3:6443"| kubectl --context=west apply -f -
