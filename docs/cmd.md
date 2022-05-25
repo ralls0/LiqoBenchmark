@@ -295,12 +295,12 @@ for ctx in west east; do
   printf "\n"
 done
 kubectl --context=east proxy --port=8080 &
-API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress')
+API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
 kill -9 %%
 ### k get svc --context=east -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
 linkerd --context=east multicluster link --cluster-name east --api-server-address="https://${API_SERVER_ADDR}"| kubectl --context=west apply -f -
 kubectl --context=west proxy --port=8080 &
-API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress')
+API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
 kill -9 %%
 ### k get svc --context=west -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
 linkerd --context=west multicluster link --cluster-name west --api-server-address="https://${API_SERVER_ADDR}" | kubectl --context=east apply -f -
