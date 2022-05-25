@@ -306,6 +306,10 @@ linkerd --context=west multicluster check
 # curl http://localhost:8080/api/
 # kill -9 %%
 # linkerd --context=east multicluster link --cluster-name east --api-server-address="https://<IP>:<PORT>"| kubectl --context=west apply -f -
+# kubectl --context=west proxy --port=8080 &
+# curl http://localhost:8080/api/
+# kill -9 %%
+# linkerd --context=west multicluster link --cluster-name west --api-server-address="https://<IP>:<PORT>" | kubectl --context=east apply -f -
 linkerd --context=west multicluster gateways
 k --context=west create ns online-boutique
 k --context=east create ns online-boutique
