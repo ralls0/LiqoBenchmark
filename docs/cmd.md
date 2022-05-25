@@ -253,14 +253,12 @@ k --context=west apply -f https://raw.githubusercontent.com/inlets/inlets-operat
 k --context=east apply -f https://raw.githubusercontent.com/inlets/inlets-operator/master/contrib/nginx-sample-deployment.yaml
 kubectl --context=west expose deployment nginx-1 --port=80 --type=LoadBalancer
 kubectl --context=east expose deployment nginx-1 --port=80 --type=LoadBalancer
-kubectl --context=west exec --stdin --tty nginx-1-<N>-<N> -- /bin/bash
-apt-get update
-apt install curl
-curl <ip>
-kubectl --context=east exec --stdin --tty nginx-1-<N>-<N> -- /bin/bash
-apt-get update
-apt install curl
-curl <ip>
+export NGINX_NAME=$(k --context=west get po -l app=nginx --no-headers -o custom-columns=:.metadata.name)
+export NGINX_ADDR=$(k --context=east get svc -l app=nginx --no-headers -o custom-columns=:.status.loadBalancer.ingress[0].ip)
+kubectl --context=west exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get update && apt install -y curl && curl ${NGINX_ADDR}"
+export NGINX_NAME=$(k --context=east get po -l app=nginx --no-headers -o custom-columns=:.metadata.name)
+export NGINX_ADDR=$(k --context=west get svc -l app=nginx --no-headers -o custom-columns=:.status.loadBalancer.ingress[0].ip)
+kubectl --context=east exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get update && apt install -y curl && curl ${NGINX_ADDR}"
 # Installiamo linkerd nei due cluster
 # Si potrebbe bloccare alla creazione delle risorse ma va tutto bene
 linkerd install \
@@ -296,21 +294,23 @@ for ctx in west east; do
   done
   printf "\n"
 done
-linkerd --context=east multicluster link --cluster-name east | kubectl --context=west apply -f -
-linkerd --context=west multicluster link --cluster-name west | kubectl --context=east apply -f -
+kubectl --context=east proxy --port=8080 &
+API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress')
+kill -9 %%
+### k get svc --context=east -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
+linkerd --context=east multicluster link --cluster-name east --api-server-address="https://${API_SERVER_ADDR}"| kubectl --context=west apply -f -
+kubectl --context=west proxy --port=8080 &
+API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress')
+kill -9 %%
+### k get svc --context=west -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
+linkerd --context=west multicluster link --cluster-name west --api-server-address="https://${API_SERVER_ADDR}" | kubectl --context=east apply -f -
+
 # Controllo link multicluster
 linkerd --context=west multicluster check
-# In caso di problemi `all gateway mirrors are healthy`:
-# Ricavare l'API Server Ip:
-# kubectl --context=east proxy --port=8080 &
-# curl http://localhost:8080/api/
-# kill -9 %%
-# linkerd --context=east multicluster link --cluster-name east --api-server-address="https://<IP>:<PORT>"| kubectl --context=west apply -f -
-# kubectl --context=west proxy --port=8080 &
-# curl http://localhost:8080/api/
-# kill -9 %%
-# linkerd --context=west multicluster link --cluster-name west --api-server-address="https://<IP>:<PORT>" | kubectl --context=east apply -f -
+linkerd --context=east multicluster check
 linkerd --context=west multicluster gateways
+linkerd --context=east multicluster gateways
+
 k --context=west create ns online-boutique
 k --context=east create ns online-boutique
 k --context=west label ns online-boutique linkerd.io/inject=enabled
@@ -328,7 +328,8 @@ linkerd viz uninstall | tee \
     >(kubectl --context=west delete -f -) \
     >(kubectl --context=east delete -f -)
 
-linkerd multicluster unlink --cluster-name=target | kubectl delete -f -
+linkerd --context=west multicluster unlink --cluster-name=east | kubectl --context=west delete -f -
+linkerd --context=east multicluster unlink --cluster-name=west | kubectl --context=east delete -f -
 
 linkerd multicluster uninstall | tee \
     >(kubectl --context=west delete -f -) \
