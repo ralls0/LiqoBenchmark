@@ -5,11 +5,11 @@ preferences: {}
 clusters:
 - cluster:
     certificate-authority-data: <CA>
-    server: https://127.0.0.1:38663
+    server: https://127.0.0.1:<PORT>
   name: kind-cluster6
 - cluster:
     certificate-authority-data: <CA>
-    server: https://127.0.0.1:38139
+    server: https://127.0.0.1:<PORT>
   name: kind-cluster7
 
 users:

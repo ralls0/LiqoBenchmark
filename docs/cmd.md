@@ -1,30 +1,5 @@
 # Comandi utilizzati
 
-## Old steps
-
-```bash
-git clone https://github.com/Ralls0/linkerd2.git
-cd linkerd2
-git checkout ral/liqo-ipam
-# https://github.com/linkerd/linkerd2/blob/main/BUILD.md
-export PATH=$PWD/bin:$PATH
-linkerd version --client
-linkerd check --pre
-# In caso di problemi di kubectl version
-curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.0/bin/linux/amd64/kubectl
-chmod +x ./kubectl
-sudo mv ./kubectl $(which kubectl)
-linkerd check --pre
-###
-linkerd install | kubectl apply -f -
-linkerd check
-# cambiare le image dei container da cr.l5d.io/linkerd a ghcr.io/ralls0/linkerd2
-# aggiunto:
-           initialDelaySeconds: 300
-#          periodSeconds: 30
-# dopo readinessProbe e livenessProbe
-```
-
 ## Addons
 
 ```bash
@@ -236,13 +211,11 @@ sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context 
 # Creiamo il trust anchor in modo che linkerd si interfacci tra i due cluster
 step certificate create root.linkerd.cluster.local root.crt root.key --profile root-ca --no-password --insecure
 # Creiamo le issuer credentials
-step certificate create identity.linkerd.cluster.local issuer.crt issuer.key \
-  --profile intermediate-ca --not-after 8760h --no-password --insecure \
-  --ca root.crt --ca-key root.key
+step certificate create identity.linkerd.cluster.local issuer.crt issuer.key --profile intermediate-ca --not-after 8760h --no-password --insecure --ca root.crt --ca-key root.key
 # Installazione metallb
 kubectl --context=west apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
 kubectl --context=west apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
-docker network inspect -f '{{.IPAM.Config}}' kind
+sudo docker network inspect -f '{{.IPAM.Config}}' kind
 # Guardiamo il range di valori dati e lo inseriamo dopo
 k --context=west apply -f - <<EOF
 apiVersion: v1
@@ -289,6 +262,7 @@ apt-get update
 apt install curl
 curl <ip>
 # Installiamo linkerd nei due cluster
+# Si potrebbe bloccare alla creazione delle risorse ma va tutto bene
 linkerd install \
   --identity-trust-anchors-file root.crt \
   --identity-issuer-certificate-file issuer.crt \
@@ -340,10 +314,7 @@ k --context=east label ns online-boutique linkerd.io/inject=enabled
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
 # Controlloe ndpoint mirrored
-k --context=west -n online-boutique exec -c server -it \
-  $(k --context=west -n online-boutique get po -l app=frontend \
-    --no-headers -o custom-columns=:.metadata.name) \
-  -- /bin/sh -c "apk add curl && curl http://shippingservice-east:50051"
+k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl -v http://shippingservice-east:50051"
 ```
 
 ## Unistall Linkerd
