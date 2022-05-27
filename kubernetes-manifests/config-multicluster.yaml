@@ -13,11 +13,11 @@ clusters:
   name: kind-cluster7
 
 users:
-- name: kind-cluster7
+- name: kind-cluster6
   user:
     client-certificate-data: <cert>
     client-key-data: <key>
-- name: kind-cluster6
+- name: kind-cluster7
   user:
     client-certificate-data: <cert>
     client-key-data: <key>

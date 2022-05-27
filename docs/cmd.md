@@ -109,7 +109,7 @@ sudo kind create cluster --name cluster7 --kubeconfig $HOME/.kube/configC7
 sudo chmod 644 $HOME/.kube/configC7
 echo "alias lc7=\"export KUBECONFIG=$HOME/.kube/configC7\"" >> $HOME/.bashrc
 
-curl -fsSL -o $HOME/.kube/config-multicluster https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/config-multicluster.yaml
+sudo curl -fsSL -o $HOME/.kube/config-multicluster https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/config-multicluster.yaml
 sudo chmod 644 $HOME/.kube/config-multicluster
 echo "alias lmc=\"export KUBECONFIG=$HOME/.kube/config-multicluster\"" >> $HOME/.bashrc
 
@@ -254,10 +254,10 @@ k --context=east apply -f https://raw.githubusercontent.com/inlets/inlets-operat
 kubectl --context=west expose deployment nginx-1 --port=80 --type=LoadBalancer
 kubectl --context=east expose deployment nginx-1 --port=80 --type=LoadBalancer
 export NGINX_NAME=$(k --context=west get po -l app=nginx --no-headers -o custom-columns=:.metadata.name)
-export NGINX_ADDR=$(k --context=east get svc -l app=nginx --no-headers -o custom-columns=:.status.loadBalancer.ingress[0].ip)
+export NGINX_ADDR=$(k --context=east get svc -l app=nginx -o jsonpath={'.items[0].status.loadBalancer.ingress[0].ip'})
 kubectl --context=west exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get update && apt install -y curl && curl ${NGINX_ADDR}"
 export NGINX_NAME=$(k --context=east get po -l app=nginx --no-headers -o custom-columns=:.metadata.name)
-export NGINX_ADDR=$(k --context=west get svc -l app=nginx --no-headers -o custom-columns=:.status.loadBalancer.ingress[0].ip)
+export NGINX_ADDR=$(k --context=west get svc -l app=nginx -o jsonpath={'.items[0].status.loadBalancer.ingress[0].ip'})
 kubectl --context=east exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get update && apt install -y curl && curl ${NGINX_ADDR}"
 # Installiamo linkerd nei due cluster
 # Si potrebbe bloccare alla creazione delle risorse ma va tutto bene
@@ -295,12 +295,12 @@ for ctx in west east; do
   printf "\n"
 done
 kubectl --context=east proxy --port=8080 &
-API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
+export API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
 kill -9 %%
 ### k get svc --context=east -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
 linkerd --context=east multicluster link --cluster-name east --api-server-address="https://${API_SERVER_ADDR}"| kubectl --context=west apply -f -
 kubectl --context=west proxy --port=8080 &
-API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
+export API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
 kill -9 %%
 ### k get svc --context=west -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
 linkerd --context=west multicluster link --cluster-name west --api-server-address="https://${API_SERVER_ADDR}" | kubectl --context=east apply -f -
