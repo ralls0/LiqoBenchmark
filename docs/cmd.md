@@ -229,7 +229,7 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 172.18.1.1-172.18.1.255 # da modificare con il valore letto prima
+      - 172.18.1.1-172.18.1.255 # Change with the correct range
 EOF
 # Installazione metallb
 kubectl --context=east apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
@@ -246,9 +246,9 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 172.18.2.1-172.18.2.255 # da modificare con il valore letto prima
+      - 172.18.2.1-172.18.2.255 # Change with the correct range
 EOF
-# controllo che i due cluster comunichino
+# Controllo che i due cluster comunichino
 k --context=west apply -f https://raw.githubusercontent.com/inlets/inlets-operator/master/contrib/nginx-sample-deployment.yaml
 k --context=east apply -f https://raw.githubusercontent.com/inlets/inlets-operator/master/contrib/nginx-sample-deployment.yaml
 kubectl --context=west expose deployment nginx-1 --port=80 --type=LoadBalancer
