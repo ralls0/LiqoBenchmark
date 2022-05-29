@@ -3,6 +3,15 @@
 ## Addons
 
 ```bash
+# My personal setup
+mkdir -p liqo && cd liqo && curl https://raw.githubusercontent.com/ralls0/Simple-script/master/bash/personal_bash_setup > ./bashsetup && chmod +x ./bashsetup
+./bashsetup
+./bashsetup
+source $HOME/.zshrc
+# Aumento la capacita del disco su crownlabs
+sudo growpart /dev/vda 2
+sudo growpart /dev/vda 5
+sudo resize2fs /dev/vda5
 # Install
 sudo apt update
 sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release jq
@@ -268,10 +277,13 @@ linkerd install \
   | tee \
     >(kubectl --context=west apply -f -) \
     >(kubectl --context=east apply -f -)
+
+# Installazione viz
 for ctx in west east; do
   linkerd --context=${ctx} viz install | \
     kubectl --context=${ctx} apply -f - || break
 done
+
 # Installazione dei componenti multicluster: Gateway, Service Mirror Service Account
 for ctx in west east; do
   echo "Installing on cluster: ${ctx} ........."
@@ -279,6 +291,7 @@ for ctx in west east; do
     kubectl --context=${ctx} apply -f - || break
   echo "-------------"
 done
+
 # Controllo che il gateway funzioni:
 for ctx in west east; do
   echo "Checking gateway on cluster: ${ctx} ........."
@@ -286,6 +299,7 @@ for ctx in west east; do
     rollout status deploy/linkerd-gateway || break
   echo "-------------"
 done
+
 for ctx in west east; do
   printf "Checking cluster: ${ctx} ........."
   while [ "$(kubectl --context=${ctx} -n linkerd-multicluster get service -o 'custom-columns=:.status.loadBalancer.ingress[0].ip' --no-headers)" = "<none>" ]; do
@@ -294,15 +308,15 @@ for ctx in west east; do
   done
   printf "\n"
 done
+
 kubectl --context=east proxy --port=8080 &
 export API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
 kill -9 %%
-### k get svc --context=east -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
 linkerd --context=east multicluster link --cluster-name east --api-server-address="https://${API_SERVER_ADDR}"| kubectl --context=west apply -f -
+
 kubectl --context=west proxy --port=8080 &
 export API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
 kill -9 %%
-### k get svc --context=west -n=linkerd-multicluster linkerd-gateway --output='go-template={{ (index .status.loadBalancer.ingress 0).ip }}'
 linkerd --context=west multicluster link --cluster-name west --api-server-address="https://${API_SERVER_ADDR}" | kubectl --context=east apply -f -
 
 # Controllo link multicluster
@@ -319,6 +333,10 @@ curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-mani
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
 # Controlloe ndpoint mirrored
 k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl -v http://shippingservice-east:50051"
+
+linkerd --context=west -n online-boutique viz stat --from deploy/frontend svc
+linkerd --context=west viz dashboard 
+
 ```
 
 ## Unistall Linkerd
