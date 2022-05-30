@@ -215,6 +215,7 @@ linkerd viz dashboard &
 
 ```bash
 # Modificare il file config-multicluster con i valori presenti in $HOME/.kube/configC6 e $HOME/.kube/configC7
+sudo vim $HOME/.kube/config-multicluster
 sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster6 west
 sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster7 east
 # Creiamo il trust anchor in modo che linkerd si interfacci tra i due cluster
@@ -268,6 +269,7 @@ kubectl --context=west exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get u
 export NGINX_NAME=$(k --context=east get po -l app=nginx --no-headers -o custom-columns=:.metadata.name)
 export NGINX_ADDR=$(k --context=west get svc -l app=nginx -o jsonpath={'.items[0].status.loadBalancer.ingress[0].ip'})
 kubectl --context=east exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get update && apt install -y curl && curl ${NGINX_ADDR}"
+
 # Installiamo linkerd nei due cluster
 # Si potrebbe bloccare alla creazione delle risorse ma va tutto bene
 linkerd install \
