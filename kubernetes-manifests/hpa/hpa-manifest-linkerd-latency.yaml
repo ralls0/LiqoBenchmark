@@ -17,9 +17,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -36,9 +37,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -55,9 +57,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -74,9 +77,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -93,9 +97,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -112,9 +117,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -131,9 +137,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -150,9 +157,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -169,9 +177,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -188,9 +197,10 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -207,7 +217,8 @@ spec:
   - type: Pods
     pods:
       metric:
-      - name: response_latency_ms_99th
+        name: response_latency_ms_99th
       target:
-      - averageValue: 8
+        type: AverageValue
+        averageValue: 8
 ---
