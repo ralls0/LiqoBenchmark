@@ -339,6 +339,11 @@ k --context=west -n online-boutique exec -c server -it $(k --context=west -n onl
 linkerd --context=west -n online-boutique viz stat --from deploy/frontend svc
 linkerd --context=west viz dashboard 
 
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/trafficsplit-west.yaml | k --context=west -n online-boutique apply -f -
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/trafficsplit-east.yaml | k --context=east -n online-boutique apply -f -
+
+
+
 ```
 
 ## Unistall Linkerd
