@@ -380,7 +380,40 @@ helm -n linkerd --namespace linkerd \
 
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq .
 
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/linkerd/pods/*/response_per_second" | jq .
+
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/leaderboard/pods/*/response_latency_ms_99th" | jq .
+
 linkerd -n online-boutique stat deploy/frontend
 
 k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/hpa-manifest-linkerd-latency.yaml
+```
+
+```bash
+k -n linkerd-viz edit cm prometheus-config
+- job_name: 'linkerd'
+  kubernetes_sd_configs:
+  - role: pod
+    namespaces:
+      names: ['linkerd-viz']
+
+  relabel_configs:
+  - source_labels:
+    - __meta_kubernetes_pod_container_name
+    action: keep
+    regex: ^prometheus$
+
+  honor_labels: true
+  metrics_path: '/federate'
+
+  params:
+    'match[]':
+      - '{job="linkerd-proxy"}'
+      - '{job="linkerd-controller"}'
+
+
+
+k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl -G --data-urlencode 'match[]={job=\"linkerd-proxy\"}' --data-urlencode 'match[]={job=\"linkerd-controller\"}' http://prometheus.linkerd-viz.svc.cluster.local:9090/federate"
+
+k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl http://prometheus.linkerd-viz.svc.cluster.local:9090/api/v1/query?query=request_total"
 ```
