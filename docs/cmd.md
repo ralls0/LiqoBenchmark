@@ -140,7 +140,7 @@ lc1
 k create ns online-boutique
 k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/ms-components.yaml
 k apply -f https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifests.yaml -n online-boutique
-k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa-manifest.yaml
+k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
 
 ## Test 2
@@ -342,7 +342,7 @@ linkerd --context=west viz dashboard
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/trafficsplit-west.yaml | k --context=west -n online-boutique apply -f -
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/trafficsplit-east.yaml | k --context=east -n online-boutique apply -f -
 
-
+linkerd --context=west -n online-boutique viz stat trafficsplit
 
 ```
 
@@ -364,4 +364,23 @@ linkerd multicluster uninstall | tee \
 linkerd uninstall | tee \
     >(kubectl --context=west delete -f -) \
     >(kubectl --context=east delete -f -)
+```
+
+
+## Custom API Server
+
+hpa/prometheus-adapter.yml
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm -n linkerd --namespace linkerd \
+  install prometheus-adapter prometheus-community/prometheus-adapter \
+  -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/prometheus-adapter.yaml
+
+kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq .
+
+linkerd -n online-boutique stat deploy/frontend
+
+k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/hpa-manifest-linkerd-latency.yaml
 ```
