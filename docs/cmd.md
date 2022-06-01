@@ -386,7 +386,7 @@ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/leaderboard/po
 
 linkerd -n online-boutique stat deploy/frontend
 
-k apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/hpa-manifest-linkerd-latency.yaml
+k -n online-boutique apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/hpa-manifest-linkerd-latency.yaml
 ```
 
 ```bash

@@ -20,7 +20,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -40,7 +40,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -60,7 +60,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -80,7 +80,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -100,7 +100,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -120,7 +120,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -140,7 +140,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -160,7 +160,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -180,7 +180,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -200,7 +200,7 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -220,5 +220,5 @@ spec:
         name: response_latency_ms_99th
       target:
         type: AverageValue
-        averageValue: 8
+        averageValue: 500
 ---
