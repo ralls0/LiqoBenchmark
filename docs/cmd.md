@@ -417,3 +417,14 @@ k --context=west -n online-boutique exec -c server -it $(k --context=west -n onl
 
 k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl http://prometheus.linkerd-viz.svc.cluster.local:9090/api/v1/query?query=request_total"
 ```
+
+
+## Prove Locust
+
+```bash
+# edit deploy e aggiunta porta
+# Creazione service
+k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "curl -v loadgenerator:8089"
+
+k --context=west -n online-boutique exec -c main -it $(k --context=west -n online-boutique get po -l app=loadgenerator --no-headers -o custom-columns=:.metadata.name) -- /bin/sh 
+```

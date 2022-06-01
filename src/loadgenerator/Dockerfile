@@ -37,4 +37,6 @@ COPY locustfile.py .
 ENV GEVENT_SUPPORT=True
 
 EXPOSE 8089
-ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u 100 -r 1 WebsiteUserIndex WebsiteUserSetCurrency WebsiteUserBrowseProduct WebsiteUserViewCart WebsiteUserAddToCart 2>&1
+ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" 
+# --headless -u 100 -r 1 WebsiteUserIndex WebsiteUserSetCurrency WebsiteUserBrowseProduct WebsiteUserViewCart WebsiteUserAddToCart 2>&1
+# --run-time 1h30m tempo limite del test
