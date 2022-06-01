@@ -567,10 +567,27 @@ spec:
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"
+        ports:
+        - containerPort: 8089
+          name: locust-web
+          protocol: TCP
         resources:
           requests:
             cpu: 300m
             memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadgenerator
+spec:
+  type: ClusterIP
+  selector:
+    app: loadgenerator
+  ports:
+  - name: http
+    port: 8090
+    targetPort: 8090
 ---
 apiVersion: apps/v1
 kind: Deployment
