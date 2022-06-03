@@ -424,7 +424,10 @@ k --context=west -n online-boutique exec -c server -it $(k --context=west -n onl
 ```bash
 # edit deploy e aggiunta porta
 # Creazione service
-k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "curl -v loadgenerator:8089"
+k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "curl -v loadgenerator:8089" # apk add curl &&
 
 k --context=west -n online-boutique exec -c main -it $(k --context=west -n online-boutique get po -l app=loadgenerator --no-headers -o custom-columns=:.metadata.name) -- /bin/sh 
+# apt update && apt install -y net-tools
+
+k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl -v loadgenerator:9646"
 ```

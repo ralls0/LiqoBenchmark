@@ -508,9 +508,6 @@ spec:
         - containerPort: 8089
           name: locust-web
           protocol: TCP
-        - containerPort: 9646
-          name: metrics
-          protocol: TCP
         resources:
           requests:
             cpu: 300m
@@ -521,13 +518,52 @@ kind: Service
 metadata:
   name: loadgenerator
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: loadgenerator
   ports:
   - name: http
-    port: 8090
-    targetPort: 8090
+    port: 8089
+    targetPort: 8089
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-exporter
+spec:
+  selector:
+    matchLabels:
+      app: locust-exporter
+  template:
+    metadata:
+      labels:
+        app: locust-exporter
+    spec:
+      containers:
+      - name: exporter
+        image: containersol/locust_exporter
+        args:
+        - "--locust.uri"
+        - "http://loadgenerator.online-boutique.svc"
+        resources:
+          requests:
+            cpu: 256m
+            memory: 256Mi
+          limits:
+            cpu: 1
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust-exporter
+  labels:
+    app: locust-exporter
+spec:
+  type: ClusterIP
+  selector:
+    app: locust-exporter
+  ports:
   - name: metrics
     port: 9646
     targetPort: 9646
