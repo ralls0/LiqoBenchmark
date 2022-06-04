@@ -3,15 +3,17 @@
 ## Addons
 
 ```bash
+# Aumento la capacita del disco su crownlabs
+sudo growpart /dev/vda 2
+sudo growpart /dev/vda 5
+sudo resize2fs /dev/vda5
+
 # My personal setup
 mkdir -p liqo && cd liqo && curl https://raw.githubusercontent.com/ralls0/Simple-script/master/bash/personal_bash_setup > ./bashsetup && chmod +x ./bashsetup
 ./bashsetup
 ./bashsetup
 source $HOME/.zshrc
-# Aumento la capacita del disco su crownlabs
-sudo growpart /dev/vda 2
-sudo growpart /dev/vda 5
-sudo resize2fs /dev/vda5
+
 # Install
 sudo apt update
 sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release jq
@@ -366,31 +368,11 @@ linkerd uninstall | tee \
     >(kubectl --context=east delete -f -)
 ```
 
-
-## Custom API Server
-
-hpa/prometheus-adapter.yml
-
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm -n linkerd --namespace linkerd \
-  install prometheus-adapter prometheus-community/prometheus-adapter \
-  -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/prometheus-adapter.yaml
-
-kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq .
-
-kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/linkerd/pods/*/response_per_second" | jq .
-
-kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/leaderboard/pods/*/response_latency_ms_99th" | jq .
-
-linkerd -n online-boutique stat deploy/frontend
-
-k -n online-boutique apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/hpa-manifest-linkerd-latency.yaml
-```
+## Integrare Prometheus
 
 ```bash
 k -n linkerd-viz edit cm prometheus-config
+### LINKERD ###
 - job_name: 'linkerd'
   kubernetes_sd_configs:
   - role: pod
@@ -411,6 +393,29 @@ k -n linkerd-viz edit cm prometheus-config
       - '{job="linkerd-proxy"}'
       - '{job="linkerd-controller"}'
 
+### LOCUST EXPORTER ###
+- job_name: 'locust'
+  scrape_interval: 5s
+  static_configs:
+  - targets:
+    - locust-exporter.online-boutique:9646
+
+k -n online-boutique apply -f - <<EOF
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: locust-exporter
+  namespace: online-boutique
+  labels:
+    demo: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: locust-exporter
+  endpoints:
+  - port: metrics
+    interval: 10s
+EOF
 
 
 k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl -G --data-urlencode 'match[]={job=\"linkerd-proxy\"}' --data-urlencode 'match[]={job=\"linkerd-controller\"}' http://prometheus.linkerd-viz.svc.cluster.local:9090/federate"
@@ -430,4 +435,24 @@ k --context=west -n online-boutique exec -c main -it $(k --context=west -n onlin
 # apt update && apt install -y net-tools
 
 k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl -v loadgenerator:9646"
+```
+
+## Custom API Server
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm -n linkerd --namespace linkerd \
+  install prometheus-adapter prometheus-community/prometheus-adapter \
+  -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/prometheus-adapter.yaml
+
+kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq .
+
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/linkerd/pods/*/response_per_second" | jq .
+
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/leaderboard/pods/*/response_latency_ms_99th" | jq .
+
+linkerd -n online-boutique stat deploy/frontend
+
+k -n online-boutique apply -f https://raw.githubusercontent.com/Ralls0/LiqoBenchmark/main/kubernetes-manifests/hpa/hpa-manifest-linkerd-latency.yaml
 ```

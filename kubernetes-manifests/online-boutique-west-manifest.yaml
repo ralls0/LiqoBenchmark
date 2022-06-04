@@ -379,7 +379,7 @@ spec:
         image: containersol/locust_exporter
         args:
         - "--locust.uri"
-        - "http://loadgenerator.online-boutique.svc"
+        - "http://loadgenerator.online-boutique.svc:8089"
         resources:
           requests:
             cpu: 256m
