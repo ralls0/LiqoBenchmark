@@ -1,5 +1,9 @@
 # Liqo benchmark
 
+## Intro
+
+Nowadays more and more enterprises use and orchestrate more than one cloud platform to deliver application services. In this context is born the Liqo project which enables the creation of a multi-cluster environment. Moreover, the Service Mesh is a new technology that is being developed. It provides features like observability, reliability, security, and even a better Load Balancing than Kubernetes ones. This project aims at simulating a real scenario where a micro-services application like Online Boutique provided by Google, which includes multiple cooperating services, wants to scale based on the workloads reached into the cluster and on more clusters. During the project, the candidate will work to design, setup, implement and compare different scenarios and service mesh solutions like Service Mesh on Liqo or Linkerd.
+
 ## Provision the playground
 
 Before starting to run the demos you should have installed some software on your system.
@@ -117,14 +121,17 @@ echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
 source $HOME/.bash
 
 # Test 3
-sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kubernetes-manifests/kind-manifestC4.yaml
+sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kubernetes-manifests/kind/kind-manifestC4.yaml
 sudo chmod 644 $HOME/.kube/configC4
 echo "alias lc4=\"export KUBECONFIG=$HOME/.kube/configC4\"" >> $HOME/.bashrc
 
-sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5 --config ./kubernetes-manifests/kind-manifestC5.yaml
+sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5 --config ./kubernetes-manifests/kind/kind-manifestC5.yaml
 sudo chmod 644 $HOME/.kube/configC5
 echo "alias lc5=\"export KUBECONFIG=$HOME/.kube/configC5\"" >> $HOME/.bashrc
 
+source $HOME/.bash
+
+# Test 4
 sudo kind create cluster --name cluster6 --kubeconfig $HOME/.kube/configC6
 sudo chmod 644 $HOME/.kube/configC6
 echo "alias lc6=\"export KUBECONFIG=$HOME/.kube/configC6\"" >> $HOME/.bashrc
@@ -133,19 +140,35 @@ sudo kind create cluster --name cluster7 --kubeconfig $HOME/.kube/configC7
 sudo chmod 644 $HOME/.kube/configC7
 echo "alias lc7=\"export KUBECONFIG=$HOME/.kube/configC7\"" >> $HOME/.bashrc
 
-sudo curl -fsSL -o $HOME/.kube/config-multicluster https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/config-multicluster.yaml
+sudo cp ./kubernetes-manifests/linkerd/config-multicluster.yaml $HOME/.kube/config-multicluster
 sudo chmod 644 $HOME/.kube/config-multicluster
 echo "alias lmc=\"export KUBECONFIG=$HOME/.kube/config-multicluster\"" >> $HOME/.bashrc
 
+# NOTE: Now, you must replace the values in `$HOME/.kube/config-multicluster` file with the correct values from the files: `$HOME/.kube/configC6` and `$HOME/.kube/configC7`
+
 source $HOME/.bashrc
+
+sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster6 west
+sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster7 east
 ```
+
+## Test
+
+For these tests, you'll play with a [micro-services application provided by Google](https://github.com/GoogleCloudPlatform/microservices-demo), which includes multiple cooperating services. Four different scenarios are provided:
+
+1. Online Boutique on a basic cluster.
+2. Online Boutique on a multi-cluster with Liqo.
+3. Online Boutique on a multi-cluster with Liqo, and Linkerd as Service Mesh provider.
+4. Online Boutique on a multi-cluster with Linkerd.
+
+
+
+
 
 
 
 
 ### INSTALL LIQO
-
-Before installing Liqo, you should set the right `kubeconfig` for your cluster properly. The Liqo installer leverages `kubectl`: by default `kubectl` refers to the default identity in `~/.kube/config` but you can override this configuration by exporting a `KUBECONFIG` variable.
 
 To do so, I'm going to use a simpe script (`scripts/liqoInstaller.sh`) that creates a cluster by means of `kind` and install Liqo on it.
 
