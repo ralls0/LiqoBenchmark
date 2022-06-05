@@ -164,7 +164,8 @@ sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --ima
 sudo chmod 644 $HOME/.kube/configC1
 echo "alias lc1=\"export KUBECONFIG=$HOME/.kube/configC1\"" >> $HOME/.bashrc
 
-source $HOME/.bash
+source $HOME/.bashrc
+lc1
 ```
 
 ### Deploy of the application
@@ -207,6 +208,8 @@ Finally, run the following command to confirm your kube-prometheus stack deploym
 ```bash
 kubectl get pods -n monitoring
 ```
+
+
 
 ### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
 

@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: locust-exporter
+  labels:
+    app: locust-service-monitor
+spec:
+  selector:
+    matchLabels:
+      app: locust-exporter
+  namespaceSelector:
+    matchNames:
+    - online-boutique
+  endpoints:
+  - port: metrics
+    interval: 5s
