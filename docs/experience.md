@@ -188,7 +188,25 @@ kubectl port-forward -n online-boutique service/frontend-external 8080:80
 
 ### Prometheus and Locust exporter
 
+Grafana and Prometheus Kubernetes Cluster monitoring provides information on potential performance bottlenecks, cluster health, performance metrics. At the same time, visualize network usage, resource usage patterns of pods, and a high-level overview of what is going on in your cluster.
 
+But before setting up a monitoring system with Grafana and Prometheus, you’ll first deploy the kube-prometheus stack Helm chart. The stack contains Prometheus, Grafana, Alertmanager, Prometheus operator, and other monitoring resources.
+
+```bash
+kubectl create namespace monitoring
+
+# Add prometheus-community repo and update
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
+
+# Install
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+```
+
+Finally, run the following command to confirm your kube-prometheus stack deployment.
+
+```bash
+kubectl get pods -n monitoring
+```
 
 ### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
 
