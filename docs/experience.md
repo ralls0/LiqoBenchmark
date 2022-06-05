@@ -211,8 +211,11 @@ kubectl get svc -n monitoring
 ```
 
 You’ll use the Prometheus service to set up port-forwarding so your Prometheus instance can be accessible outside of your cluster.
+But, before that you should create the service monitor resource so that prometheus can scrape metrics exposed by the locust-exporter.
 
 ```bash
+k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
+
 kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090
 ```
 

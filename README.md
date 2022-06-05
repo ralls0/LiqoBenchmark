@@ -164,7 +164,8 @@ sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --ima
 sudo chmod 644 $HOME/.kube/configC1
 echo "alias lc1=\"export KUBECONFIG=$HOME/.kube/configC1\"" >> $HOME/.bashrc
 
-source $HOME/.bash
+source $HOME/.bashrc
+lc1
 ```
 
 ### Deploy of the application
@@ -185,6 +186,40 @@ And with the command `kubectl port-forward` you can forward the requests from yo
 ```bash
 kubectl port-forward -n online-boutique service/frontend-external 8080:80
 ```
+
+### Prometheus and Locust exporter
+
+Grafana and Prometheus Kubernetes Cluster monitoring provides information on potential performance bottlenecks, cluster health, performance metrics. At the same time, visualize network usage, resource usage patterns of pods, and a high-level overview of what is going on in your cluster.
+
+But before setting up a monitoring system with Grafana and Prometheus, you’ll first deploy the kube-prometheus stack Helm chart. The stack contains Prometheus, Grafana, Alertmanager, Prometheus operator, and other monitoring resources.
+
+```bash
+kubectl create namespace monitoring
+
+# Add prometheus-community repo and update
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
+
+# Install
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+```
+
+Finally, run the following command to confirm your kube-prometheus stack deployment.
+
+```bash
+kubectl get pods -n monitoring
+kubectl get svc -n monitoring
+```
+
+You’ll use the Prometheus service to set up port-forwarding so your Prometheus instance can be accessible outside of your cluster.
+But, before that you should create the service monitor resource so that prometheus can scrape metrics exposed by the locust-exporter.
+
+```bash
+k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
+
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090
+```
+
+
 
 ### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
 
