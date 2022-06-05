@@ -288,5 +288,30 @@ source $HOME/.bash
 lc2
 ```
 
+### Liqo installation
+
+```bash
+chmod +x ./scripts/liqoInstaller.sh
+./scripts/liqoInstaller.sh
+source <(liqoctl completion bash) >> $HOME/.bashrc
+
+liqoctl install kind --cluster-name cluster2
+lc3
+liqoctl install kind --cluster-name cluster3
+lc2
+```
+
 ### Deploy of the application
+
+```bash
+k create ns online-boutique
+kubectl label namespace online-boutique liqo.io/enabled=true
+k apply -f ./kubernetes-manifests/online-boutique/boutique-manifests-affinity.yaml -n online-boutique
+```
+
+Once the demo application manifest is applied, you can observe the creation of the different pods:
+
+```bash
+k get pods -n online-boutique -o wide
+```
 
