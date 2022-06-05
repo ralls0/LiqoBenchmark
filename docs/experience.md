@@ -100,16 +100,7 @@ chmod 700 get_helm.sh
 ## Creation of the Clusters
 
 ```bash
-# Test 2
-sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2 --image kindest/node:v1.23.5
-sudo chmod 644 $HOME/.kube/configC2
-echo "alias lc2=\"export KUBECONFIG=$HOME/.kube/configC2\"" >> $HOME/.bashrc
 
-sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3 --image kindest/node:v1.23.5
-sudo chmod 644 $HOME/.kube/configC3
-echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
-
-source $HOME/.bash
 
 # Test 3
 sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kubernetes-manifests/kind/kind-manifestC4.yaml
@@ -276,4 +267,26 @@ k apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 To do so, I'm going to use a simpe script (`scripts/liqoInstaller.sh`) that creates a cluster by means of `kind` and install Liqo on it.
 
 > NOTE: For the official docs see the upstream: [liqoctl](https://doc.liqo.io/installation/#liqoctl)
+
+## Test 2
+
+### Creation of the Cluster
+
+Before starting the test, you should create the cluster where you'll operate.
+
+```bash
+# Test 2
+sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2 --image kindest/node:v1.23.5
+sudo chmod 644 $HOME/.kube/configC2
+echo "alias lc2=\"export KUBECONFIG=$HOME/.kube/configC2\"" >> $HOME/.bashrc
+
+sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3 --image kindest/node:v1.23.5
+sudo chmod 644 $HOME/.kube/configC3
+echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
+
+source $HOME/.bash
+lc2
+```
+
+### Deploy of the application
 
