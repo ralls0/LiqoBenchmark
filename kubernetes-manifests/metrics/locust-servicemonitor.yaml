@@ -4,6 +4,7 @@ metadata:
   name: locust-exporter
   labels:
     app: locust-service-monitor
+    release: prometheus
 spec:
   selector:
     matchLabels:
