@@ -187,6 +187,22 @@ And with the command `kubectl port-forward` you can forward the requests from yo
 kubectl port-forward -n online-boutique service/frontend-external 8080:80
 ```
 
+Before deploying the kube-prometheus stack you must start the loadgenerator.
+
+```bash
+kubectl port-forward -n online-boutique service/loadgenerator 8089
+```
+
+I'm using 100 users with 1 second of spawn rate for my test.
+
+Now, you can check that losut-exporter is monitoring the loadgenerator resource.
+
+```bash
+kubectl port-forward -n online-boutique service/locust-exporter 9646
+```
+
+
+
 ### Prometheus and Locust exporter
 
 Grafana and Prometheus Kubernetes Cluster monitoring provides information on potential performance bottlenecks, cluster health, performance metrics. At the same time, visualize network usage, resource usage patterns of pods, and a high-level overview of what is going on in your cluster.
@@ -211,15 +227,25 @@ kubectl get svc -n monitoring
 ```
 
 You’ll use the Prometheus service to set up port-forwarding so your Prometheus instance can be accessible outside of your cluster.
-But, before that you should create the service monitor resource so that prometheus can scrape metrics exposed by the locust-exporter.
+But, before that, you should create the service monitor resource so that Prometheus can scrape metrics exposed by the locust-exporter.
 
 ```bash
 k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
 
+# wait some mininutes
 kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090
 ```
 
+Now, you can import the Grafana dashboard that show the application status.
 
+```bash
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+
+kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
+
+# Import the json dashboard ./kubernetes-manifests/grafana-dashboard.json
+```
 
 ### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
 
