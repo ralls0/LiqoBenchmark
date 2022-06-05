@@ -192,8 +192,6 @@ Now, you can check that losut-exporter is monitoring the loadgenerator resource.
 kubectl port-forward -n online-boutique service/locust-exporter 9646
 ```
 
-
-
 ### Prometheus and Locust exporter
 
 Grafana and Prometheus Kubernetes Cluster monitoring provides information on potential performance bottlenecks, cluster health, performance metrics. At the same time, visualize network usage, resource usage patterns of pods, and a high-level overview of what is going on in your cluster.
@@ -284,7 +282,7 @@ sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3 --ima
 sudo chmod 644 $HOME/.kube/configC3
 echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
 
-source $HOME/.bash
+source $HOME/.bashrc
 lc2
 ```
 
@@ -301,6 +299,18 @@ liqoctl install kind --cluster-name cluster3
 lc2
 ```
 
+Using kubectl, you can also manually obtain the list of discovered foreign clusters:
+
+```bash
+kubectl get foreignclusters
+```
+
+If the peering has succeeded, you should see a virtual node (named liqo-*) in addition to your physical nodes:
+
+```bash
+kubectl get nodes
+```
+
 ### Deploy of the application
 
 ```bash
@@ -309,9 +319,22 @@ kubectl label namespace online-boutique liqo.io/enabled=true
 k apply -f ./kubernetes-manifests/online-boutique/boutique-manifests-affinity.yaml -n online-boutique
 ```
 
-Once the demo application manifest is applied, you can observe the creation of the different pods:
+Once the demo application manifest is applied, you can observe the creation of the different pods. On the node column you can see if the pods are hosted by the local or remote cluster:
 
 ```bash
 k get pods -n online-boutique -o wide
 ```
 
+When all pods are running you can start the loadgenerator:
+
+```bash
+kubectl port-forward -n online-boutique service/loadgenerator 8089
+```
+
+I'm using 100 users with 1 second of spawn rate for my test.
+
+Now, you can check that losut-exporter is monitoring the loadgenerator resource.
+
+```bash
+kubectl port-forward -n online-boutique service/locust-exporter 9646
+```
