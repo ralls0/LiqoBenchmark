@@ -99,16 +99,7 @@ chmod 700 get_helm.sh
 
 ## Creation of the Clusters
 
-Before starting each test case, you should create the cluster where you'll operate. The following commands create all clusters for the four tests:
-
 ```bash
-# Test 1
-sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --image kindest/node:v1.23.5
-sudo chmod 644 $HOME/.kube/configC1
-echo "alias lc1=\"export KUBECONFIG=$HOME/.kube/configC1\"" >> $HOME/.bashrc
-
-source $HOME/.bash
-
 # Test 2
 sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2 --image kindest/node:v1.23.5
 sudo chmod 644 $HOME/.kube/configC2
@@ -161,12 +152,67 @@ For these tests, you'll play with a [micro-services application provided by Goog
 3. Online Boutique on a multi-cluster with Liqo, and Linkerd as Service Mesh provider.
 4. Online Boutique on a multi-cluster with Linkerd.
 
+## Test 1
+
+### Creation of the Cluster
+
+Before starting the test, you should create the cluster where you'll operate.
+
+```bash
+# Test 1
+sudo kind create cluster --name cluster1 --kubeconfig $HOME/.kube/configC1 --image kindest/node:v1.23.5
+sudo chmod 644 $HOME/.kube/configC1
+echo "alias lc1=\"export KUBECONFIG=$HOME/.kube/configC1\"" >> $HOME/.bashrc
+
+source $HOME/.bash
+```
+
+### Deploy of the application
+
+```bash
+k create ns online-boutique
+k apply -f ./kubernetes-manifests/online-boutique/boutique-manifests.yaml -n online-boutique
+```
+
+Once the demo application manifest is applied, you can observe the creation of the different pods:
+
+```bash
+k get pods -n online-boutique -o wide
+```
+
+And with the command `kubectl port-forward` you can forward the requests from your local machine (i.e. `http://localhost:8080`) to the frontend service:
+
+```bash
+kubectl port-forward -n online-boutique service/frontend-external 8080:80
+```
+
+### Prometheus and Locust exporter
 
 
 
+### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
 
+You can deploy the Kubernetes Metrics Server on clusters you create using Container Engine.
 
+To deploy the Kubernetes Metrics Server on a cluster you've created with Container Engine for Kubernetes:
 
+1. In a terminal window, deploy the Kubernetes Metrics Server by entering:
+
+```bash
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+```
+
+2. Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
+
+```bash
+kubectl get deployment metrics-server -n kube-system
+```
+
+### HPA - Horizontal Pod Autoscaling
+
+```bash
+k apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
+```
 
 ### INSTALL LIQO
 
