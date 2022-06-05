@@ -538,6 +538,10 @@ spec:
     metadata:
       labels:
         app: locust-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9646"
     spec:
       containers:
       - name: exporter

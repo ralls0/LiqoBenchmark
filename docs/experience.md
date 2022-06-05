@@ -207,6 +207,13 @@ Finally, run the following command to confirm your kube-prometheus stack deploym
 
 ```bash
 kubectl get pods -n monitoring
+kubectl get svc -n monitoring
+```
+
+You’ll use the Prometheus service to set up port-forwarding so your Prometheus instance can be accessible outside of your cluster.
+
+```bash
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090
 ```
 
 
