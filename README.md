@@ -383,6 +383,16 @@ chmod +x ./scripts/liqoInstaller.sh
 ./scripts/liqoInstaller.sh
 source <(liqoctl completion bash) >> $HOME/.bashrc
 
+NODE1=$(sudo docker ps | grep cluster4 | head -n1 | cut -d " " -f1)
+sudo docker exec -it $NODE1 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.20.0.0/16 -j RETURN
+NODE2=$(sudo docker ps | grep cluster4 | tail -n1 | cut -d " " -f1)
+sudo docker exec -it $NODE2 bash -- iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.20.0.0/16 -j RETURN
+
+NODE1=$(sudo docker ps | grep cluster5 | head -n1 | cut -d " " -f1)
+sudo docker exec -it $NODE1 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
+NODE2=$(sudo docker ps | grep cluster5 | tail -n1 | cut -d " " -f1)
+sudo docker exec -it $NODE2 bash -- iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
+
 liqoctl install kind --cluster-name cluster2
 lc3
 liqoctl install kind --cluster-name cluster3
