@@ -73,17 +73,6 @@ sudo apt install -y kubectl
 sudo apt-mark hold kubectl
 ```
 
-### Linkerd
-
-```bash
-# Check
-command -v linkerd
-
-# Install
-curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
-export PATH=$PATH:$HOME/.linkerd2/bin
-```
-
 ### Helm
 
 Finally, helm because the `liqoctl` uses it to configure and install the Liqo by means of `helm chart`.
@@ -361,6 +350,17 @@ echo "alias lc5=\"export KUBECONFIG=$HOME/.kube/configC5\"" >> $HOME/.bashrc
 
 source $HOME/.bashrc
 lc4
+```
+
+### Deploy of the application
+
+If this is your first time running Linkerd, you will need to download the linkerd CLI onto your local machine. The CLI will allow you to interact with your Linkerd deployment.
+
+To install the CLI manually, run:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
+export PATH=$PATH:$HOME/.linkerd2/bin
 ```
 
 ## Test 4
