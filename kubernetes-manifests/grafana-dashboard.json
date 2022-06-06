@@ -1043,7 +1043,7 @@
         "datasource": {
           "uid": "$datasource"
         },
-        "definition": "label_values(kube_pod_info{namespace=~\"liqo-demo.*\"}, namespace)",
+        "definition": "label_values(kube_pod_info{namespace=~\"online-boutique.*\"}, namespace)",
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -1051,7 +1051,7 @@
         "name": "namespace",
         "options": [],
         "query": {
-          "query": "label_values(kube_pod_info{namespace=~\"liqo-demo.*\"}, namespace)",
+          "query": "label_values(kube_pod_info{namespace=~\"online-boutique.*\"}, namespace)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -1128,7 +1128,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Liqo-demo",
+  "title": "Locust",
   "uid": "2FJb-uaGz",
   "version": 1
 }

@@ -2,7 +2,7 @@
 
 ## Intro
 
-Nowadays more and more enterprises use and orchestrate more than one cloud platform to deliver application services. In this context is born the Liqo project which enables the creation of a multi-cluster environment. Moreover, the Service Mesh is a new technology that is being developed. It provides features like observability, reliability, security, and even a better Load Balancing than Kubernetes ones. This project aims at simulating a real scenario where a micro-services application like Online Boutique provided by Google, which includes multiple cooperating services, wants to scale based on the workloads reached into the cluster and on more clusters. During the project, the candidate will work to design, setup, implement and compare different scenarios and service mesh solutions like Service Mesh on Liqo or Linkerd.
+Nowadays more and more enterprises use and orchestrate more than one cloud platform to deliver application services. In this context is born the Liqo project which enables the creation of a multi-cluster environment. Moreover, the Service Mesh is a new technology that is being developed. It provides features like observability, reliability, security, and even a better Load Balancing than Kubernetes ones. This project aims at simulating a real scenario where a micro-services application like [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo) provided by Google, which includes multiple cooperating services, wants to scale based on the workloads reached into the cluster and on more clusters. During the project, you'll design, setup, implement and compare different scenarios and service mesh solutions like Service Mesh on Liqo or Linkerd.
 
 ## Provision the playground
 
