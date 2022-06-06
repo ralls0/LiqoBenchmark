@@ -23,7 +23,7 @@ First things first, I'm going to install some extra tools, and all the necessary
 
 ```bash
 sudo apt update
-sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release xclip jq
+sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release xclip git jq
 
 # Goland
 wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
@@ -376,7 +376,32 @@ source $HOME/.bashrc
 lc4
 ```
 
-### Deploy of the application
+### Liqo installation
+
+```bash
+chmod +x ./scripts/liqoInstaller.sh
+./scripts/liqoInstaller.sh
+source <(liqoctl completion bash) >> $HOME/.bashrc
+
+liqoctl install kind --cluster-name cluster2
+lc3
+liqoctl install kind --cluster-name cluster3
+lc2
+```
+
+Using kubectl, you can also manually obtain the list of discovered foreign clusters:
+
+```bash
+kubectl get foreignclusters
+```
+
+If the peering has succeeded, you should see a virtual node (named liqo-*) in addition to your physical nodes:
+
+```bash
+kubectl get nodes
+```
+
+### Linkerd installation
 
 If this is your first time running Linkerd, you will need to download the linkerd CLI onto your local machine. The CLI will allow you to interact with your Linkerd deployment.
 
@@ -386,6 +411,10 @@ To install the CLI manually, run:
 curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
 export PATH=$PATH:$HOME/.linkerd2/bin
 ```
+
+### Deploy of the application
+
+
 
 ## Test 4
 
