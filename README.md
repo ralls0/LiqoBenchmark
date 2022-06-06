@@ -216,7 +216,7 @@ kubectl get deployment metrics-server -n kube-system
 Now, you can create the horizontal pod autoscaling resources.
 
 ```bash
-k apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
+k -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
 
 ## Test 2
@@ -353,7 +353,7 @@ kubectl get deployment metrics-server -n kube-system
 Now, you can create the horizontal pod autoscaling resources.
 
 ```bash
-k apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
+k -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
 
 ## Test 3
