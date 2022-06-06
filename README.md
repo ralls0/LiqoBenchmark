@@ -22,7 +22,7 @@ First things first, I'm going to install some extra tools, and all the necessary
 
 ```bash
 sudo apt update
-sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release jq
+sudo apt install -y apt-transport-https  ca-certificates curl gnupg lsb-release xclip jq
 
 # Goland
 wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
@@ -100,16 +100,7 @@ chmod 700 get_helm.sh
 ## Creation of the Clusters
 
 ```bash
-# Test 2
-sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2 --image kindest/node:v1.23.5
-sudo chmod 644 $HOME/.kube/configC2
-echo "alias lc2=\"export KUBECONFIG=$HOME/.kube/configC2\"" >> $HOME/.bashrc
 
-sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3 --image kindest/node:v1.23.5
-sudo chmod 644 $HOME/.kube/configC3
-echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
-
-source $HOME/.bash
 
 # Test 3
 sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kubernetes-manifests/kind/kind-manifestC4.yaml
@@ -187,11 +178,23 @@ And with the command `kubectl port-forward` you can forward the requests from yo
 kubectl port-forward -n online-boutique service/frontend-external 8080:80
 ```
 
+Before deploying the kube-prometheus stack you must start the loadgenerator.
+
+```bash
+kubectl port-forward -n online-boutique service/loadgenerator 8089
+```
+
+I'm using 100 users with 1 second of spawn rate for my test.
+
+Now, you can check that losut-exporter is monitoring the loadgenerator resource.
+
+```bash
+kubectl port-forward -n online-boutique service/locust-exporter 9646
+```
+
 ### Prometheus and Locust exporter
 
-Grafana and Prometheus Kubernetes Cluster monitoring provides information on potential performance bottlenecks, cluster health, performance metrics. At the same time, visualize network usage, resource usage patterns of pods, and a high-level overview of what is going on in your cluster.
-
-But before setting up a monitoring system with Grafana and Prometheus, you’ll first deploy the kube-prometheus stack Helm chart. The stack contains Prometheus, Grafana, Alertmanager, Prometheus operator, and other monitoring resources.
+Before setting up a monitoring system with Grafana and Prometheus, you’ll first deploy the kube-prometheus stack Helm chart. The stack contains Prometheus, Grafana, Alertmanager, Prometheus operator, and other monitoring resources.
 
 ```bash
 kubectl create namespace monitoring
@@ -211,15 +214,27 @@ kubectl get svc -n monitoring
 ```
 
 You’ll use the Prometheus service to set up port-forwarding so your Prometheus instance can be accessible outside of your cluster.
-But, before that you should create the service monitor resource so that prometheus can scrape metrics exposed by the locust-exporter.
+But, before that, you should create the service monitor resource so that Prometheus can scrape metrics exposed by the locust-exporter.
 
 ```bash
 k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
 
+# wait some mininutes
 kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090
 ```
 
+Now, you can import the Grafana dashboard that show the application status.
 
+```bash
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+
+kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
+
+xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
+
+# Import the json dashboard ./kubernetes-manifests/grafana-dashboard.json
+```
 
 ### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
 
@@ -244,3 +259,117 @@ kubectl get deployment metrics-server -n kube-system
 ```bash
 k apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
+
+## Test 2
+
+### Creation of the Cluster
+
+Before starting the test, you should create the cluster where you'll operate.
+
+```bash
+# Test 2
+sudo kind create cluster --name cluster2 --kubeconfig $HOME/.kube/configC2 --image kindest/node:v1.23.5
+sudo chmod 644 $HOME/.kube/configC2
+echo "alias lc2=\"export KUBECONFIG=$HOME/.kube/configC2\"" >> $HOME/.bashrc
+
+sudo kind create cluster --name cluster3 --kubeconfig $HOME/.kube/configC3 --image kindest/node:v1.23.5
+sudo chmod 644 $HOME/.kube/configC3
+echo "alias lc3=\"export KUBECONFIG=$HOME/.kube/configC3\"" >> $HOME/.bashrc
+
+source $HOME/.bashrc
+lc2
+```
+
+### Liqo installation
+
+```bash
+chmod +x ./scripts/liqoInstaller.sh
+./scripts/liqoInstaller.sh
+source <(liqoctl completion bash) >> $HOME/.bashrc
+
+liqoctl install kind --cluster-name cluster2
+lc3
+liqoctl install kind --cluster-name cluster3
+lc2
+```
+
+Using kubectl, you can also manually obtain the list of discovered foreign clusters:
+
+```bash
+kubectl get foreignclusters
+```
+
+If the peering has succeeded, you should see a virtual node (named liqo-*) in addition to your physical nodes:
+
+```bash
+kubectl get nodes
+```
+
+### Deploy of the application
+
+```bash
+k create ns online-boutique
+kubectl label namespace online-boutique liqo.io/enabled=true
+k apply -f ./kubernetes-manifests/online-boutique/boutique-manifests-affinity.yaml -n online-boutique
+```
+
+Once the demo application manifest is applied, you can observe the creation of the different pods. On the node column you can see if the pods are hosted by the local or remote cluster:
+
+```bash
+k get pods -n online-boutique -o wide
+```
+
+When all pods are running you can start the loadgenerator:
+
+```bash
+kubectl port-forward -n online-boutique service/loadgenerator 8089
+```
+
+I'm using 100 users with 1 second of spawn rate for my test.
+
+Now, you can check that losut-exporter is monitoring the loadgenerator resource.
+
+```bash
+kubectl port-forward -n online-boutique service/locust-exporter 9646
+```
+
+### Prometheus and Locust exporter
+
+Now, you can deploy the kube-prometheus stack Helm chart.
+
+```bash
+kubectl create namespace monitoring
+
+# Add prometheus-community repo and update
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
+
+# Install
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+```
+
+Finally, run the following command to confirm your kube-prometheus stack deployment.
+
+```bash
+kubectl get pods -n monitoring
+```
+
+To scrape metrics exposed by the locust-exporter you should create the service monitor resource.
+
+```bash
+k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
+```
+
+You can see the metrics by importing the Grafana dashboard.
+
+```bash
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+
+kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
+
+xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
+
+# Import the json dashboard ./kubernetes-manifests/grafana-dashboard.json
+```
+
+## Test 3
