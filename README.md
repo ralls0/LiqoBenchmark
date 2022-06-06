@@ -174,7 +174,6 @@ Finally, run the following command to confirm your kube-prometheus stack deploym
 
 ```bash
 kubectl get pods -n monitoring
-kubectl get svc -n monitoring
 ```
 
 You’ll use the Prometheus service to set up port-forwarding so your Prometheus instance can be accessible outside of your cluster.
@@ -183,6 +182,8 @@ But, before that, you should create the service monitor resource so that Prometh
 ```bash
 k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
 
+kubectl get svc -n monitoring
+
 # wait some mininutes
 kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090
 ```
@@ -190,7 +191,10 @@ kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 909
 Now, you can import the Grafana dashboard that show the application status.
 
 ```bash
+# Admin Password
 k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Admin User
 k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
 
 kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
@@ -326,7 +330,10 @@ k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.ya
 You can see the metrics by importing the Grafana dashboard.
 
 ```bash
+# Admin Password
 k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Admin User
 k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
 
 kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
@@ -383,4 +390,3 @@ source $HOME/.bashrc
 sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster6 west
 sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster7 east
 ```
-
