@@ -2,14 +2,15 @@
 
 ## Intro
 
-Nowadays more and more enterprises use and orchestrate more than one cloud platform to deliver application services. In this context is born the Liqo project which enables the creation of a multi-cluster environment. Moreover, the Service Mesh is a new technology that is being developed. It provides features like observability, reliability, security, and even a better Load Balancing than Kubernetes ones. This project aims at simulating a real scenario where a micro-services application like [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo) provided by Google, which includes multiple cooperating services, wants to scale based on the workloads reached into the cluster and on more clusters. During the project, you'll design, setup, implement and compare different scenarios and service mesh solutions like Service Mesh on Liqo or Linkerd.
+Nowadays more and more enterprises use and orchestrate more than one cloud platform to deliver application services. In this context it is born "The Liqo project", which enables the creation of a multi-cluster environment. Moreover, the Service Mesh is a new technology that is being developed. It provides features like observability, reliability, security, and even a better Load Balancing than Kubernetes ones. This project aims at simulating a real scenario where a micro-services application like [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo) provided by Google, which includes multiple cooperating services, wants to scale based on the workloads reached into the cluster and on more clusters. During the project, you'll design, setup, implement and compare different scenarios and service mesh solutions like Service Mesh on Liqo or Linkerd.
 
 ## Provision the playground
 
 Before starting to run the demos you should have installed some software on your system.
 
-For my tests, I’m going to setup the clusters on the virtual machines hosted on [CrownLabs](https://crownlabs.polito.it/). > VMs: 4 CORE, 8 GB of RAM, and 25 GB of disk.
+For my tests, I’m going to setup the clusters on the virtual machines hosted on [CrownLabs](https://crownlabs.polito.it/).
 
+> VMs: 4 CORE, 8 GB of RAM, and 25 GB of disk.
 > NOTE: By default, not all 25 GB are available. You can use these commands to extend the disk:
 
 ```bash
@@ -95,43 +96,6 @@ command -v helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
-```
-
-## Creation of the Clusters
-
-```bash
-
-
-# Test 3
-sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kubernetes-manifests/kind/kind-manifestC4.yaml
-sudo chmod 644 $HOME/.kube/configC4
-echo "alias lc4=\"export KUBECONFIG=$HOME/.kube/configC4\"" >> $HOME/.bashrc
-
-sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5 --config ./kubernetes-manifests/kind/kind-manifestC5.yaml
-sudo chmod 644 $HOME/.kube/configC5
-echo "alias lc5=\"export KUBECONFIG=$HOME/.kube/configC5\"" >> $HOME/.bashrc
-
-source $HOME/.bash
-
-# Test 4
-sudo kind create cluster --name cluster6 --kubeconfig $HOME/.kube/configC6
-sudo chmod 644 $HOME/.kube/configC6
-echo "alias lc6=\"export KUBECONFIG=$HOME/.kube/configC6\"" >> $HOME/.bashrc
-
-sudo kind create cluster --name cluster7 --kubeconfig $HOME/.kube/configC7
-sudo chmod 644 $HOME/.kube/configC7
-echo "alias lc7=\"export KUBECONFIG=$HOME/.kube/configC7\"" >> $HOME/.bashrc
-
-sudo cp ./kubernetes-manifests/linkerd/config-multicluster.yaml $HOME/.kube/config-multicluster
-sudo chmod 644 $HOME/.kube/config-multicluster
-echo "alias lmc=\"export KUBECONFIG=$HOME/.kube/config-multicluster\"" >> $HOME/.bashrc
-
-# NOTE: Now, you must replace the values in `$HOME/.kube/config-multicluster` file with the correct values from the files: `$HOME/.kube/configC6` and `$HOME/.kube/configC7`
-
-source $HOME/.bashrc
-
-sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster6 west
-sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster7 east
 ```
 
 ## Test
@@ -238,7 +202,7 @@ xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
 
 ### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
 
-You can deploy the Kubernetes Metrics Server on clusters you create using Container Engine.
+You can deploy the Kubernetes Metrics Server on clusters you created using Container Engine.
 
 To deploy the Kubernetes Metrics Server on a cluster you've created with Container Engine for Kubernetes:
 
@@ -373,3 +337,50 @@ xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
 ```
 
 ## Test 3
+
+### Creation of the Cluster
+
+Before starting the test, you should create the cluster where you'll operate.
+
+```bash
+# Test 3
+sudo kind create cluster --name cluster4 --kubeconfig $HOME/.kube/configC4 --config ./kubernetes-manifests/kind/kind-manifestC4.yaml
+sudo chmod 644 $HOME/.kube/configC4
+echo "alias lc4=\"export KUBECONFIG=$HOME/.kube/configC4\"" >> $HOME/.bashrc
+
+sudo kind create cluster --name cluster5 --kubeconfig $HOME/.kube/configC5 --config ./kubernetes-manifests/kind/kind-manifestC5.yaml
+sudo chmod 644 $HOME/.kube/configC5
+echo "alias lc5=\"export KUBECONFIG=$HOME/.kube/configC5\"" >> $HOME/.bashrc
+
+source $HOME/.bashrc
+lc4
+```
+
+## Test 4
+
+### Creation of the Cluster
+
+Before starting the test, you should create the cluster where you'll operate.
+
+```bash
+# Test 4
+sudo kind create cluster --name cluster6 --kubeconfig $HOME/.kube/configC6
+sudo chmod 644 $HOME/.kube/configC6
+echo "alias lc6=\"export KUBECONFIG=$HOME/.kube/configC6\"" >> $HOME/.bashrc
+
+sudo kind create cluster --name cluster7 --kubeconfig $HOME/.kube/configC7
+sudo chmod 644 $HOME/.kube/configC7
+echo "alias lc7=\"export KUBECONFIG=$HOME/.kube/configC7\"" >> $HOME/.bashrc
+
+sudo cp ./kubernetes-manifests/linkerd/config-multicluster.yaml $HOME/.kube/config-multicluster
+sudo chmod 644 $HOME/.kube/config-multicluster
+echo "alias lmc=\"export KUBECONFIG=$HOME/.kube/config-multicluster\"" >> $HOME/.bashrc
+
+# NOTE: Now, you must replace the values in `$HOME/.kube/config-multicluster` file with the correct values from the files: `$HOME/.kube/configC6` and `$HOME/.kube/configC7`
+
+source $HOME/.bashrc
+
+sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster6 west
+sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster7 east
+```
+
