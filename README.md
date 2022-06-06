@@ -213,6 +213,8 @@ kubectl get deployment metrics-server -n kube-system
 
 ### HPA - Horizontal Pod Autoscaling
 
+Now, you can create the horizontal pod autoscaling resources.
+
 ```bash
 k apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
@@ -330,6 +332,28 @@ kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
 xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
 
 # Import the json dashboard ./kubernetes-manifests/grafana-dashboard.json
+```
+
+### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
+
+You can deploy the Kubernetes Metrics Server on the cluster you created with the following commands:
+
+```bash
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+```
+
+Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
+
+```bash
+kubectl get deployment metrics-server -n kube-system
+```
+
+### HPA - Horizontal Pod Autoscaling
+
+Now, you can create the horizontal pod autoscaling resources.
+
+```bash
+k apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
 
 ## Test 3
