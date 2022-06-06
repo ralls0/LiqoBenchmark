@@ -7,8 +7,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: emailservice
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -38,8 +38,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: checkoutservice
-  minReplicas: 4
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -69,8 +69,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: recommendationservice
-  minReplicas: 10
-  maxReplicas: 12
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -104,20 +104,9 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: frontend
-  minReplicas: 2
-  maxReplicas: 30
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
-    - type: Object
-      object:
-        metric:
-          name: locust_requests_current_response_time_percentile_50
-        describedObject:
-          apiVersion: "/v1"
-          kind: Service
-          name: locust-exporter
-        target:
-          type: Value
-          value: 2k
     - type: Resource
       resource:
         name: cpu
@@ -146,8 +135,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: paymentservice
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -177,8 +166,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: productcatalogservice
-  minReplicas: 10
-  maxReplicas: 12
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -208,8 +197,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: cartservice
-  minReplicas: 4
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -239,8 +228,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: currencyservice
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -270,8 +259,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: shippingservice
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
@@ -289,8 +278,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: adservice
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
