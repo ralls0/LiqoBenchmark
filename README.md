@@ -393,10 +393,11 @@ sudo docker exec -it $NODE1 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0
 NODE2=$(sudo docker ps | grep cluster5 | tail -n1 | cut -d " " -f1)
 sudo docker exec -it $NODE2 bash -- iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
 
-liqoctl install kind --cluster-name cluster2
-lc3
-liqoctl install kind --cluster-name cluster3
-lc2
+lc4
+liqoctl install kind --cluster-name cluster4 --version=c169957721e85290aa19e0fefce4b5961538d532 --repo-url=https://github.com/giorio94/liqo
+
+lc5
+liqoctl install kind --cluster-name cluster5 --version=c169957721e85290aa19e0fefce4b5961538d532 --repo-url=https://github.com/giorio94/liqo
 ```
 
 Using kubectl, you can also manually obtain the list of discovered foreign clusters:
