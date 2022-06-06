@@ -194,9 +194,7 @@ kubectl port-forward -n online-boutique service/locust-exporter 9646
 
 ### Prometheus and Locust exporter
 
-Grafana and Prometheus Kubernetes Cluster monitoring provides information on potential performance bottlenecks, cluster health, performance metrics. At the same time, visualize network usage, resource usage patterns of pods, and a high-level overview of what is going on in your cluster.
-
-But before setting up a monitoring system with Grafana and Prometheus, you’ll first deploy the kube-prometheus stack Helm chart. The stack contains Prometheus, Grafana, Alertmanager, Prometheus operator, and other monitoring resources.
+Before setting up a monitoring system with Grafana and Prometheus, you’ll first deploy the kube-prometheus stack Helm chart. The stack contains Prometheus, Grafana, Alertmanager, Prometheus operator, and other monitoring resources.
 
 ```bash
 kubectl create namespace monitoring
@@ -338,3 +336,42 @@ Now, you can check that losut-exporter is monitoring the loadgenerator resource.
 ```bash
 kubectl port-forward -n online-boutique service/locust-exporter 9646
 ```
+
+### Prometheus and Locust exporter
+
+Now, you can deploy the kube-prometheus stack Helm chart.
+
+```bash
+kubectl create namespace monitoring
+
+# Add prometheus-community repo and update
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
+
+# Install
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+```
+
+Finally, run the following command to confirm your kube-prometheus stack deployment.
+
+```bash
+kubectl get pods -n monitoring
+```
+
+To scrape metrics exposed by the locust-exporter you should create the service monitor resource.
+
+```bash
+k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
+```
+
+You can see the metrics by importing the Grafana dashboard.
+
+```bash
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+
+kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
+
+# Import the json dashboard ./kubernetes-manifests/grafana-dashboard.json
+```
+
+## Test 3
