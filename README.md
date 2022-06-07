@@ -1,5 +1,37 @@
 # Liqo benchmark
 
+## Table of Contents
+
+1. [Intro](#intro)
+2. [Provision the playground](#provision-the-playground)
+    1. [Docker](#docker)
+    2. [Kind & kubectl](#kind--kubectl)
+    3. [Helm](#helm)
+3. [Test](#test)
+4. [Test 1](#test-1)
+    1. [Creation of the Cluster](#creation-of-the-cluster)
+    2. [Deploy of the application](#deploy-of-the-application)
+    3. [Prometheus and Locust exporter](#prometheus-and-locust-exporter)
+    4. [Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl](#deploying-the-kubernetes-metrics-server-on-a-cluster-using-kubectl)
+    5. [HPA - Horizontal Pod Autoscaling](#hpa---horizontal-pod-autoscaling)
+5. [Test 2](#test-2)
+    1. [Creation of the Cluster](#creation-of-the-cluster-1)
+    2. [Liqo installation](#liqo-installation)
+    3. [Deploy of the application](#deploy-of-the-application-1)
+    4. [Prometheus and Locust exporter](#prometheus-and-locust-exporter-1)
+    5. [Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl](#deploying-the-kubernetes-metrics-server-on-a-cluster-using-kubectl-1)
+    6. [HPA - Horizontal Pod Autoscaling](#hpa---horizontal-pod-autoscaling-1)
+6. [Test 3](#test-3)
+    1. [Creation of the Cluster](#creation-of-the-cluster-2)
+    2. [Liqo installation](#liqo-installation)
+    3. [Linkerd installation](#linkerd-installation)
+    4. [Deploy of the application](#deploy-of-the-application-2)
+    5. [Prometheus and Locust exporter](#prometheus-and-locust-exporter-2)
+    6. [Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl](#deploying-the-kubernetes-metrics-server-on-a-cluster-using-kubectl-2)
+    7. [HPA - Horizontal Pod Autoscaling](#hpa---horizontal-pod-autoscaling-2)
+7. [Test 4](#test-4)
+    1. [Creation of the Cluster](#creation-of-the-cluster-3)
+
 ## Intro
 
 Nowadays more and more enterprises use and orchestrate more than one cloud platform to deliver application services. In this context it is born "The Liqo project", which enables the creation of a multi-cluster environment. Moreover, the Service Mesh is a new technology that is being developed. It provides features like observability, reliability, security, and even a better Load Balancing than Kubernetes ones. This project aims at simulating a real scenario where a micro-services application like [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo) provided by Google, which includes multiple cooperating services, wants to scale based on the workloads reached into the cluster and on more clusters. During the project, you'll design, setup, implement and compare different scenarios and service mesh solutions like Service Mesh on Liqo or Linkerd.
