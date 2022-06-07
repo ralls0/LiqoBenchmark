@@ -192,6 +192,7 @@ lc4
 linkerd install | kubectl apply -f -
 linkerd check
 liqoctl offload namespace linkerd --pod-offloading-strategy=Local --namespace-mapping-strategy=EnforceSameName
+
 kubectl create ns online-boutique
 liqoctl offload namespace online-boutique --namespace-mapping-strategy=EnforceSameName
 curl -fsSL https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/kubernetes-manifests.yaml | linkerd inject - | kubectl -n online-boutique apply -f -

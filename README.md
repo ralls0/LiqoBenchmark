@@ -391,7 +391,7 @@ sudo docker exec -it $NODE2 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.20.0.0
 NODE1=$(sudo docker ps | grep cluster5 | head -n1 | cut -d " " -f1)
 sudo docker exec -it $NODE1 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
 NODE2=$(sudo docker ps | grep cluster5 | tail -n1 | cut -d " " -f1)
-sudo docker exec -it $NODE2 bash iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
+sudo docker exec -it $NODE2 iptables -t nat -I KIND-MASQ-AGENT 2 --dst 10.10.0.0/16 -j RETURN
 
 lc4
 liqoctl install kind --cluster-name cluster4 --version=416839b0915a8a0a7d78331b5efb76bde5444910
@@ -421,11 +421,111 @@ To install the CLI manually, run:
 ```bash
 curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
 export PATH=$PATH:$HOME/.linkerd2/bin
+
+linkerd check --pre
+
+lc4
+linkerd install | kubectl apply -f -
+linkerd check
+
+liqoctl offload namespace linkerd --pod-offloading-strategy=Local --namespace-mapping-strategy=EnforceSameName
 ```
 
 ### Deploy of the application
 
+```bash
+kubectl create ns online-boutique
 
+liqoctl offload namespace online-boutique --namespace-mapping-strategy=EnforceSameName
+
+cat ./kubernetes-manifests/online-boutique/boutique-manifests-affinity.yaml | linkerd inject - | kubectl -n online-boutique apply -f -
+
+linkerd -n online-boutique check --proxy
+```
+
+Once the demo application manifest is applied, you can observe the creation of the different pods. On the node column you can see if the pods are hosted by the local or remote cluster:
+
+```bash
+k get pods -n online-boutique -o wide
+```
+
+When all pods are running you can start the loadgenerator:
+
+```bash
+kubectl port-forward -n online-boutique service/loadgenerator 8089
+```
+
+I'm using 100 users with 1 second of spawn rate for my test.
+
+Now, you can check that losut-exporter is monitoring the loadgenerator resource.
+
+```bash
+kubectl port-forward -n online-boutique service/locust-exporter 9646
+```
+
+### Prometheus and Locust exporter
+
+Now, you can deploy the kube-prometheus stack Helm chart.
+
+```bash
+kubectl create namespace monitoring
+
+# Add prometheus-community repo and update
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
+
+# Install
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+```
+
+Finally, run the following command to confirm your kube-prometheus stack deployment.
+
+```bash
+kubectl get pods -n monitoring
+```
+
+To scrape metrics exposed by the locust-exporter you should create the service monitor resource.
+
+```bash
+k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
+```
+
+You can see the metrics by importing the Grafana dashboard.
+
+```bash
+# Admin Password
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Admin User
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+
+kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
+
+xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
+
+# Import the json dashboard ./kubernetes-manifests/grafana-dashboard.json
+```
+
+### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
+
+You can deploy the Kubernetes Metrics Server on the cluster you created with the following commands:
+
+```bash
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+```
+
+Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
+
+```bash
+kubectl get deployment metrics-server -n kube-system
+```
+
+### HPA - Horizontal Pod Autoscaling
+
+Now, you can create the horizontal pod autoscaling resources.
+
+```bash
+k -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
+```
 
 ## Test 4
 
