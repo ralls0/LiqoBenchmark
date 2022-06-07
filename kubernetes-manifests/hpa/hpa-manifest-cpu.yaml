@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: emailservice
@@ -17,7 +17,7 @@ spec:
           type: Utilization
           averageUtilization: 60
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: checkoutservice
@@ -36,7 +36,7 @@ spec:
           type: Utilization
           averageUtilization: 50
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: recommendationservice
@@ -55,7 +55,7 @@ spec:
           type: Utilization
           averageUtilization: 80
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: frontend
@@ -74,7 +74,7 @@ spec:
           type: Utilization
           averageUtilization: 60
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: paymentservice
@@ -93,7 +93,7 @@ spec:
           type: Utilization
           averageUtilization: 60
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: productcatalogservice
@@ -112,7 +112,7 @@ spec:
           type: Utilization
           averageUtilization: 80
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: cartservice
@@ -131,7 +131,7 @@ spec:
           type: Utilization
           averageUtilization: 60
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: currencyservice
@@ -150,7 +150,7 @@ spec:
           type: Utilization
           averageUtilization: 50
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: shippingservice
@@ -169,7 +169,7 @@ spec:
           type: Utilization
           averageUtilization: 60
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: adservice
