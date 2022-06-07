@@ -14,8 +14,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 60
+          type: AverageValue
+          averageValue: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -33,8 +33,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 50
+          type: AverageValue
+          averageValue: 50
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -52,8 +52,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 80
+          type: AverageValue
+          averageValue: 80
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -71,8 +71,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 60
+          type: AverageValue
+          averageValue: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -90,8 +90,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 60
+          type: AverageValue
+          averageValue: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -109,8 +109,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 80
+          type: AverageValue
+          averageValue: 80
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -128,8 +128,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 60
+          type: AverageValue
+          averageValue: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -147,8 +147,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 50
+          type: AverageValue
+          averageValue: 50
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -166,8 +166,8 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 60
+          type: AverageValue
+          averageValue: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -185,7 +185,7 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 60
+          type: AverageValue
+          averageValue: 60
 ---
 
