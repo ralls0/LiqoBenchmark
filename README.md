@@ -542,6 +542,10 @@ xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
 You can deploy the Kubernetes Metrics Server on the cluster you created with the following commands:
 
 ```bash
+lc4
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+
+lc5 
 kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
 ```
 
