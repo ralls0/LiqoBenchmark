@@ -6,10 +6,10 @@ metadata:
 spec:
   service: checkoutservice
   backends:
-  - service: checkoutservice
-    weight: 50
+  #- service: checkoutservice
+  #  weight: 100
   - service: checkoutservice-east
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -18,10 +18,10 @@ metadata:
 spec:
   service: paymentservice
   backends:
-  - service: paymentservice
-    weight: 50
+  #- service: paymentservice
+  #  weight: 100
   - service: paymentservice-east
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -30,10 +30,10 @@ metadata:
 spec:
   service: cartservice
   backends:
-  - service: cartservice
-    weight: 50
+  #- service: cartservice
+  #  weight: 100
   - service: cartservice-east
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -42,10 +42,10 @@ metadata:
 spec:
   service: shippingservice
   backends:
-  - service: shippingservice
-    weight: 50
+  #- service: shippingservice
+  #  weight: 100
   - service: shippingservice-east
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -54,8 +54,8 @@ metadata:
 spec:
   service: adservice
   backends:
-  - service: adservice
-    weight: 50
+  #- service: adservice
+  #  weight: 100
   - service: adservice-east
-    weight: 50
+    weight: 100
 ---

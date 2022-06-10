@@ -6,10 +6,10 @@ metadata:
 spec:
   service: emailservice
   backends:
-  - service: emailservice
-    weight: 50
+  #- service: emailservice
+  #  weight: 100
   - service: emailservice-west
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -18,10 +18,10 @@ metadata:
 spec:
   service: recommendationservice
   backends:
-  - service: recommendationservice
-    weight: 50
+  #- service: recommendationservice
+  #  weight: 100
   - service: recommendationservice-west
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -30,10 +30,10 @@ metadata:
 spec:
   service: frontend
   backends:
-  - service: frontend
-    weight: 50
+  # - service: frontend
+    # weight: 100
   - service: frontend-west
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -43,9 +43,9 @@ spec:
   service: frontend-external
   backends:
   - service: frontend-external
-    weight: 50
+    weight: 100
   - service: frontend-external-west
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -55,9 +55,9 @@ spec:
   service: productcatalogservice
   backends:
   - service: productcatalogservice
-    weight: 50
+    weight: 100
   - service: productcatalogservice-west
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -66,10 +66,10 @@ metadata:
 spec:
   service: currencyservice
   backends:
-  - service: currencyservice
-    weight: 50
+  # - service: currencyservice
+    # weight: 100
   - service: currencyservice-west
-    weight: 50
+    weight: 100
 ---
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
@@ -78,8 +78,8 @@ metadata:
 spec:
   service: redis-cart
   backends:
-  - service: redis-cart
-    weight: 50
+  # - service: redis-cart
+    # weight: 100
   - service: redis-cart-west
-    weight: 50
+    weight: 100
 ---
