@@ -31,6 +31,10 @@
     7. [HPA - Horizontal Pod Autoscaling](#hpa---horizontal-pod-autoscaling-2)
 7. [Test 4](#test-4)
     1. [Creation of the Cluster](#creation-of-the-cluster-3)
+    2. [Deploy of the MetalLB](#deploy-of-the-metallb)
+    3. [Creation of the trust anchor](#creation-of-the-trust-anchor)
+    4. [Linkerd installation](#linkerd-installation-1)
+    5. [Deploy of the application](#deploy-of-the-application-3)
 
 ## Intro
 
@@ -589,4 +593,216 @@ source $HOME/.bashrc
 
 sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster6 west
 sudo kubectl config --kubeconfig=$HOME/.kube/config-multicluster rename-context kind-cluster7 east
+
+lmc
+```
+
+### Deploy of the MetalLB
+
+To work Linkerd, in a multi-cluster scenario, requires service of type LoadBalancer, but Kubernetes does not offer an implementation of network load balancers for bare-metal clusters. If you’re not running on a supported IaaS platform (GCP, AWS, Azure…), LoadBalancers will remain in the “pending” state indefinitely when created. MetalLB aims to redress this imbalance by offering a network load balancer implementation.
+
+You can deploy the MetalLB in your cluster by running the following commands:
+
+> NOTE: [Installing metallb using default manifests](https://kind.sigs.k8s.io/docs/user/loadbalancer/).
+
+```bash
+kubectl --context=west apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+
+kubectl --context=west apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+```
+
+To complete layer2 configuration, we need to provide metallb a range of IP addresses it controls. We want this range to be on the docker kind network.
+
+You can see the kind network rage with this command:
+
+```bash
+sudo docker network inspect -f '{{.IPAM.Config}}' kind
+```
+
+Now, you must create the ConfigMap resource containing the desired range:
+
+```bash
+k --context=west apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 172.18.1.1-172.18.1.255 # Change with the correct range
+EOF
+```
+
+You must repeat these steps for the east cluster:
+
+```bash
+kubectl --context=east apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+
+kubectl --context=east apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+
+k --context=east apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 172.18.2.1-172.18.2.255 # Change with the correct range
+EOF
+```
+
+Secondly, you can check the communication between the two clusters by deploying two Nginx services and performing a curl command for each side:
+
+```bash
+k --context=west apply -f https://raw.githubusercontent.com/inlets/inlets-operator/master/contrib/nginx-sample-deployment.yaml
+kubectl --context=west expose deployment nginx-1 --port=80 --type=LoadBalancer
+
+k --context=east apply -f https://raw.githubusercontent.com/inlets/inlets-operator/master/contrib/nginx-sample-deployment.yaml
+kubectl --context=east expose deployment nginx-1 --port=80 --type=LoadBalancer
+
+export NGINX_NAME=$(k --context=west get po -l app=nginx --no-headers -o custom-columns=:.metadata.name)
+export NGINX_ADDR=$(k --context=east get svc -l app=nginx -o jsonpath={'.items[0].status.loadBalancer.ingress[0].ip'})
+kubectl --context=west exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get update && apt install -y curl && curl ${NGINX_ADDR}"
+
+export NGINX_NAME=$(k --context=east get po -l app=nginx --no-headers -o custom-columns=:.metadata.name)
+export NGINX_ADDR=$(k --context=west get svc -l app=nginx -o jsonpath={'.items[0].status.loadBalancer.ingress[0].ip'})
+kubectl --context=east exec --stdin --tty $NGINX_NAME -- /bin/bash -c "apt-get update && apt install -y curl && curl ${NGINX_ADDR}"
+```
+
+### Creation of the trust anchor
+
+Linkerd requires a shared trust anchor to exist between the installations in all clusters that communicate with each other. This is used to encrypt the traffic between clusters and authorize requests that reach the gateway so that your cluster is not open to the public internet.
+
+> NOTE: For more information see the [official documentation](https://linkerd.io/2.11/tasks/multicluster/).
+
+```bash
+mkdir trust && cd ./trust
+
+# Root CA
+step certificate create root.linkerd.cluster.local root.crt root.key --profile root-ca --no-password --insecure
+
+# Issuer credentials
+step certificate create identity.linkerd.cluster.local issuer.crt issuer.key --profile intermediate-ca --not-after 8760h --no-password --insecure --ca root.crt --ca-key root.key
+```
+
+### Linkerd installation
+
+To install linkerd run:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
+export PATH=$PATH:$HOME/.linkerd2/bin
+
+# Linkerd
+linkerd install \
+  --identity-trust-anchors-file root.crt \
+  --identity-issuer-certificate-file issuer.crt \
+  --identity-issuer-key-file issuer.key \
+  | tee \
+    >(kubectl --context=west apply -f -) \
+    >(kubectl --context=east apply -f -)
+```
+
+You can verify that everything has come up successfully with a check:
+
+```bash
+for ctx in west east; do
+  echo "Checking cluster: ${ctx} ........."
+  linkerd --context=${ctx} check || break
+  echo "-------------"
+done
+```
+
+To install the multicluster components on both west and east, you can run:
+
+```bash
+# Multi-Cluster components:
+# - Gateway
+# - Service Mirror
+# - Service Account
+
+for ctx in west east; do
+  echo "Installing on cluster: ${ctx} ........."
+  linkerd --context=${ctx} multicluster install | \
+    kubectl --context=${ctx} apply -f - || break
+  echo "-------------"
+done
+```
+
+Make sure the gateway comes up successfully by running:
+
+```bash
+for ctx in west east; do
+  echo "Checking gateway on cluster: ${ctx} ........."
+  kubectl --context=${ctx} -n linkerd-multicluster \
+    rollout status deploy/linkerd-gateway || break
+  echo "-------------"
+done
+```
+
+Double check that the load balancer was able to allocate a public IP address by running:
+
+```bash
+for ctx in west east; do
+  printf "Checking cluster: ${ctx} ........."
+  while [ "$(kubectl --context=${ctx} -n linkerd-multicluster get service -o 'custom-columns=:.status.loadBalancer.ingress[0].ip' --no-headers)" = "<none>" ]; do
+      printf '.'
+      sleep 1
+  done
+  printf "\n"
+done
+```
+
+The next step is to link west to east. This will create a credentials secret, a Link resource, and a service-mirror controller. The credentials secret contains a kubeconfig which can be used to access the target (east) cluster’s Kubernetes API.
+
+```bash
+# Retrieve the API Server address for the east cluster
+kubectl --context=east proxy --port=8080 &
+
+export API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
+
+kill -9 %%
+
+# Perform the link
+linkerd --context=east multicluster link --cluster-name east --api-server-address="https://${API_SERVER_ADDR}"| kubectl --context=west apply -f -
+
+# Retrieve the API Server address for the west cluster
+kubectl --context=west proxy --port=8080 &
+
+export API_SERVER_ADDR=$(curl http://localhost:8080/api/ | jq '.serverAddressByClientCIDRs[0].serverAddress' | sed 's/\"//g')
+
+kill -9 %%
+
+# Perform the link
+linkerd --context=west multicluster link --cluster-name west --api-server-address="https://${API_SERVER_ADDR}" | kubectl --context=east apply -f -
+
+# Some check
+linkerd --context=west multicluster check
+linkerd --context=east multicluster check
+linkerd --context=west multicluster gateways
+linkerd --context=east multicluster gateways
+```
+
+### Deploy of the application
+
+```bash
+k --context=west create ns online-boutique
+k --context=east create ns online-boutique
+
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
+
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
+
+# Traffic Split
+curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/trafficsplit-west.yaml | k --context=west -n online-boutique apply -f -
 ```
