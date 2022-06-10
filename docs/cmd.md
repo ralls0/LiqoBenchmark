@@ -336,8 +336,6 @@ k --context=west label ns online-boutique linkerd.io/inject=enabled
 k --context=east label ns online-boutique linkerd.io/inject=enabled
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
-# Controlloe ndpoint mirrored
-k --context=west -n online-boutique exec -c server -it $(k --context=west -n online-boutique get po -l app=frontend --no-headers -o custom-columns=:.metadata.name) -- /bin/sh -c "apk add curl && curl -v http://shippingservice-east:50051"
 
 linkerd --context=west -n online-boutique viz stat --from deploy/frontend svc
 linkerd --context=west viz dashboard 

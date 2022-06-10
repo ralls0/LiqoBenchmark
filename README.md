@@ -35,6 +35,9 @@
     3. [Creation of the trust anchor](#creation-of-the-trust-anchor)
     4. [Linkerd installation](#linkerd-installation-1)
     5. [Deploy of the application](#deploy-of-the-application-3)
+    6. [Prometheus and Locust exporter](#prometheus-and-locust-exporter-3)
+    7. [Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl](#deploying-the-kubernetes-metrics-server-on-a-cluster-using-kubectl-3)
+    8. [HPA - Horizontal Pod Autoscaling](#hpa---horizontal-pod-autoscaling-3)
 
 ## Intro
 
@@ -173,7 +176,7 @@ Before deploying the kube-prometheus stack you must start the loadgenerator.
 kubectl port-forward -n online-boutique service/loadgenerator 8089
 ```
 
-I'm using 100 users with 1 second of spawn rate for my test.
+I'm using 200 users with 1 second of spawn rate for my test.
 
 Now, you can check that losut-exporter is monitoring the loadgenerator resource.
 
@@ -320,7 +323,7 @@ When all pods are running you can start the loadgenerator:
 kubectl port-forward -n online-boutique service/loadgenerator 8089
 ```
 
-I'm using 100 users with 1 second of spawn rate for my test.
+I'm using 200 users with 1 second of spawn rate for my test.
 
 Now, you can check that losut-exporter is monitoring the loadgenerator resource.
 
@@ -491,7 +494,7 @@ When all pods are running you can start the loadgenerator:
 kubectl port-forward -n online-boutique service/loadgenerator 8089
 ```
 
-I'm using 100 users with 1 second of spawn rate for my test.
+I'm using 200 users with 1 second of spawn rate for my test.
 
 Now, you can check that losut-exporter is monitoring the loadgenerator resource.
 
@@ -805,4 +808,92 @@ curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-mani
 
 # Traffic Split
 curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/trafficsplit-west.yaml | k --context=west -n online-boutique apply -f -
+```
+
+Once the demo application manifest is applied, you can observe the creation of the different pods.
+
+```bash
+k --context=west get pods -n online-boutique -o wide
+```
+
+When all pods are running you can start the loadgenerator:
+
+```bash
+kubectl port-forward -n online-boutique service/loadgenerator 8089
+```
+
+I'm using 200 users with 1 second of spawn rate for my test.
+
+Now, you can check that losut-exporter is monitoring the loadgenerator resource.
+
+```bash
+kubectl port-forward -n online-boutique service/locust-exporter 9646
+```
+
+### Prometheus and Locust exporter
+
+Now, you can deploy the kube-prometheus stack Helm chart.
+
+```bash
+kubectl create namespace monitoring
+
+# Add prometheus-community repo and update
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
+
+# Install
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+```
+
+Finally, run the following command to confirm your kube-prometheus stack deployment.
+
+```bash
+kubectl get pods -n monitoring
+```
+
+To scrape metrics exposed by the locust-exporter you should create the service monitor resource.
+
+```bash
+k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
+```
+
+You can see the metrics by importing the Grafana dashboard.
+
+```bash
+# Admin Password
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Admin User
+k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+
+kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
+
+xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
+
+# Import the json dashboard ./kubernetes-manifests/grafana-dashboard.json
+```
+
+### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
+
+You can deploy the Kubernetes Metrics Server on the cluster you created with the following commands:
+
+```bash
+lc4
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+
+lc5 
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+```
+
+Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
+
+```bash
+kubectl get deployment metrics-server -n kube-system
+```
+
+### HPA - Horizontal Pod Autoscaling
+
+Now, you can create the horizontal pod autoscaling resources.
+
+```bash
+k -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
