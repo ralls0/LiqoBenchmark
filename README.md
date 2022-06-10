@@ -792,8 +792,9 @@ linkerd --context=west multicluster link --cluster-name west --api-server-addres
 # Some check
 linkerd --context=west multicluster check
 linkerd --context=east multicluster check
-linkerd --context=west multicluster gateways
-linkerd --context=east multicluster gateways
+# with linkerd viz install
+# linkerd --context=west multicluster gateways
+# linkerd --context=east multicluster gateways
 ```
 
 ### Deploy of the application
@@ -802,12 +803,12 @@ linkerd --context=east multicluster gateways
 k --context=west create ns online-boutique
 k --context=east create ns online-boutique
 
-curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
+cat ./kubernetes-manifests/online-boutique/online-boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
 
-curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
+cat ./kubernetes-manifests/online-boutique/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
 
 # Traffic Split
-curl https://raw.githubusercontent.com/ralls0/LiqoBenchmark/main/kubernetes-manifests/trafficsplit-west.yaml | k --context=west -n online-boutique apply -f -
+cat ./kubernetes-manifests/linkerd/trafficsplit-west.yaml | k --context=west -n online-boutique apply -f -
 ```
 
 Once the demo application manifest is applied, you can observe the creation of the different pods.
