@@ -351,7 +351,7 @@ Finally, run the following command to confirm your kube-prometheus stack deploym
 kubectl get pods -n monitoring
 ```
 
-To scrape metrics exposed by the locust-exporter you should create the service monitor resource.
+In order to scrape metrics exposed by the locust-exporter you should create the service monitor resource.
 
 ```bash
 k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
@@ -522,7 +522,7 @@ Finally, run the following command to confirm your kube-prometheus stack deploym
 kubectl get pods -n monitoring
 ```
 
-To scrape metrics exposed by the locust-exporter you should create the service monitor resource.
+In order to scrape metrics exposed by the locust-exporter you should create the service monitor resource.
 
 ```bash
 k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
@@ -602,7 +602,7 @@ lmc
 
 ### Deploy of the MetalLB
 
-To work Linkerd, in a multi-cluster scenario, requires service of type LoadBalancer, but Kubernetes does not offer an implementation of network load balancers for bare-metal clusters. If you’re not running on a supported IaaS platform (GCP, AWS, Azure…), LoadBalancers will remain in the “pending” state indefinitely when created. MetalLB aims to redress this imbalance by offering a network load balancer implementation.
+To work Linkerd, in a multi-cluster scenario, a service of type LoadBalancer is required, but Kubernetes does not offer an implementation of network load balancers for bare-metal clusters. If you’re not running on a supported IaaS platform (GCP, AWS, Azure…), LoadBalancers will remain in the “pending” state indefinitely when created. MetalLB aims to redress this imbalance by offering a network load balancer implementation.
 
 You can deploy the MetalLB in your cluster by running the following commands:
 
@@ -803,12 +803,14 @@ linkerd --context=east multicluster check
 k --context=west create ns online-boutique
 k --context=east create ns online-boutique
 
-cat ./kubernetes-manifests/online-boutique/online-boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
+cat ./kubernetes-manifests/online-boutique/boutique-west-manifest.yaml | linkerd inject - | k --context=west -n online-boutique apply -f -
 
-cat ./kubernetes-manifests/online-boutique/online-boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
+cat ./kubernetes-manifests/online-boutique/boutique-east-manifest.yaml | linkerd inject - | k --context=east -n online-boutique apply -f -
 
 # Traffic Split
 cat ./kubernetes-manifests/linkerd/trafficsplit-west.yaml | k --context=west -n online-boutique apply -f -
+
+cat ./kubernetes-manifests/linkerd/trafficsplit-east.yaml | k --context=east -n online-boutique apply -f -
 ```
 
 Once the demo application manifest is applied, you can observe the creation of the different pods.
@@ -820,7 +822,7 @@ k --context=west get pods -n online-boutique -o wide
 When all pods are running you can start the loadgenerator:
 
 ```bash
-kubectl port-forward -n online-boutique service/loadgenerator 8089
+kubectl --context=west port-forward -n online-boutique service/loadgenerator 8089
 ```
 
 I'm using 200 users with 1 second of spawn rate for my test.
@@ -828,7 +830,7 @@ I'm using 200 users with 1 second of spawn rate for my test.
 Now, you can check that losut-exporter is monitoring the loadgenerator resource.
 
 ```bash
-kubectl port-forward -n online-boutique service/locust-exporter 9646
+kubectl --context=west port-forward -n online-boutique service/locust-exporter 9646
 ```
 
 ### Prometheus and Locust exporter
@@ -836,7 +838,7 @@ kubectl port-forward -n online-boutique service/locust-exporter 9646
 Now, you can deploy the kube-prometheus stack Helm chart.
 
 ```bash
-kubectl create namespace monitoring
+kubectl --context=west create namespace monitoring
 
 # Add prometheus-community repo and update
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
@@ -848,25 +850,25 @@ helm install prometheus prometheus-community/kube-prometheus-stack --namespace m
 Finally, run the following command to confirm your kube-prometheus stack deployment.
 
 ```bash
-kubectl get pods -n monitoring
+kubectl --context=west get pods -n monitoring
 ```
 
-To scrape metrics exposed by the locust-exporter you should create the service monitor resource.
+In order to scrape metrics exposed by the locust-exporter you should create the service monitor resource.
 
 ```bash
-k -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
+k --context=west -n monitoring apply -f ./kubernetes-manifests/metrics/locust-servicemonitor.yaml
 ```
 
 You can see the metrics by importing the Grafana dashboard.
 
 ```bash
 # Admin Password
-k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+k --context=west -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 
 # Admin User
-k -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
+k --context=west -n monitoring get secret prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode ; echo
 
-kubectl port-forward svc/prometheus-grafana -n monitoring 8080:80
+kubectl --context=west port-forward svc/prometheus-grafana -n monitoring 8080:80
 
 xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
 
@@ -878,17 +880,15 @@ xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
 You can deploy the Kubernetes Metrics Server on the cluster you created with the following commands:
 
 ```bash
-lc4
-kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+kubectl --context=west apply -f ./kubernetes-manifests/metrics/ms-components.yaml
 
-lc5 
-kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+kubectl --context=west apply -f ./kubernetes-manifests/metrics/ms-components.yaml
 ```
 
 Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
 
 ```bash
-kubectl get deployment metrics-server -n kube-system
+kubectl --context=west get deployment metrics-server -n kube-system
 ```
 
 ### HPA - Horizontal Pod Autoscaling
@@ -896,5 +896,5 @@ kubectl get deployment metrics-server -n kube-system
 Now, you can create the horizontal pod autoscaling resources.
 
 ```bash
-k -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
+k --context=west -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
