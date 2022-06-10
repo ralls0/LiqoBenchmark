@@ -882,7 +882,7 @@ You can deploy the Kubernetes Metrics Server on the cluster you created with the
 ```bash
 kubectl --context=west apply -f ./kubernetes-manifests/metrics/ms-components.yaml
 
-kubectl --context=west apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+kubectl --context=east apply -f ./kubernetes-manifests/metrics/ms-components.yaml
 ```
 
 Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
