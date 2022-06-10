@@ -6,8 +6,8 @@ metadata:
 spec:
   service: emailservice
   backends:
-  #- service: emailservice
-  #  weight: 100
+  - service: emailservice
+    weight: 0
   - service: emailservice-west
     weight: 100
 ---
@@ -18,8 +18,8 @@ metadata:
 spec:
   service: recommendationservice
   backends:
-  #- service: recommendationservice
-  #  weight: 100
+  - service: recommendationservice
+    weight: 0
   - service: recommendationservice-west
     weight: 100
 ---
@@ -30,8 +30,8 @@ metadata:
 spec:
   service: frontend
   backends:
-  # - service: frontend
-    # weight: 100
+  - service: frontend
+    weight: 0
   - service: frontend-west
     weight: 100
 ---
@@ -43,7 +43,7 @@ spec:
   service: frontend-external
   backends:
   - service: frontend-external
-    weight: 100
+    weight: 0
   - service: frontend-external-west
     weight: 100
 ---
@@ -55,7 +55,7 @@ spec:
   service: productcatalogservice
   backends:
   - service: productcatalogservice
-    weight: 100
+    weight: 0
   - service: productcatalogservice-west
     weight: 100
 ---
@@ -66,8 +66,8 @@ metadata:
 spec:
   service: currencyservice
   backends:
-  # - service: currencyservice
-    # weight: 100
+  - service: currencyservice
+    weight: 0
   - service: currencyservice-west
     weight: 100
 ---
@@ -78,8 +78,8 @@ metadata:
 spec:
   service: redis-cart
   backends:
-  # - service: redis-cart
-    # weight: 100
+  - service: redis-cart
+    weight: 0
   - service: redis-cart-west
     weight: 100
 ---

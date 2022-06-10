@@ -6,8 +6,8 @@ metadata:
 spec:
   service: checkoutservice
   backends:
-  #- service: checkoutservice
-  #  weight: 100
+  - service: checkoutservice
+    weight: 0
   - service: checkoutservice-east
     weight: 100
 ---
@@ -18,8 +18,8 @@ metadata:
 spec:
   service: paymentservice
   backends:
-  #- service: paymentservice
-  #  weight: 100
+  - service: paymentservice
+    weight: 0
   - service: paymentservice-east
     weight: 100
 ---
@@ -30,8 +30,8 @@ metadata:
 spec:
   service: cartservice
   backends:
-  #- service: cartservice
-  #  weight: 100
+  - service: cartservice
+    weight: 0
   - service: cartservice-east
     weight: 100
 ---
@@ -42,8 +42,8 @@ metadata:
 spec:
   service: shippingservice
   backends:
-  #- service: shippingservice
-  #  weight: 100
+  - service: shippingservice
+    weight: 0
   - service: shippingservice-east
     weight: 100
 ---
@@ -54,8 +54,8 @@ metadata:
 spec:
   service: adservice
   backends:
-  #- service: adservice
-  #  weight: 100
+  - service: adservice
+    weight: 0
   - service: adservice-east
     weight: 100
 ---
