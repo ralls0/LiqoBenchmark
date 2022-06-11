@@ -7,7 +7,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: emailservice
-    namespace: online-boutique
   minReplicas: 1
   maxReplicas: 5
   metrics:
@@ -27,7 +26,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: recommendationservice
-    namespace: online-boutique
   minReplicas: 1
   maxReplicas: 5
   metrics:
@@ -47,7 +45,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: frontend
-    namespace: online-boutique
   minReplicas: 1
   maxReplicas: 5
   metrics:
@@ -67,7 +64,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: productcatalogservice
-    namespace: online-boutique
   minReplicas: 1
   maxReplicas: 5
   metrics:
@@ -87,7 +83,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: currencyservice
-    namespace: online-boutique
   minReplicas: 1
   maxReplicas: 5
   metrics:
