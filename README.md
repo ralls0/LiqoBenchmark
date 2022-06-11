@@ -567,6 +567,7 @@ kubectl get deployment metrics-server -n kube-system
 Now, you can create the horizontal pod autoscaling resources.
 
 ```bash
+lc4
 k -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
 
@@ -714,6 +715,8 @@ linkerd install \
   | tee \
     >(kubectl --context=west apply -f -) \
     >(kubectl --context=east apply -f -)
+
+cd ..
 ```
 
 You can verify that everything has come up successfully with a check:
