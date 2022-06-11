@@ -898,5 +898,5 @@ Now, you can create the horizontal pod autoscaling resources.
 ```bash
 k --context=west -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu-west.yaml
 
-k --context=east -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu-west.yaml
+k --context=east -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu-east.yaml
 ```

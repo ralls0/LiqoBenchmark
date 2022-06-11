@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: checkoutservice
@@ -18,7 +18,7 @@ spec:
           type: AverageValue
           averageValue: 50m
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: paymentservice
@@ -38,7 +38,7 @@ spec:
           type: AverageValue
           averageValue: 60m
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: cartservice
@@ -58,7 +58,7 @@ spec:
           type: AverageValue
           averageValue: 120m
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: shippingservice
@@ -78,7 +78,7 @@ spec:
           type: AverageValue
           averageValue: 60m
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: adservice
