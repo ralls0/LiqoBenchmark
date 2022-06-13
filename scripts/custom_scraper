@@ -15,6 +15,7 @@ while [[ i -lt $# ]]; do
   echo -e "[i] Parse ${FLAG} ${FVALUE}"
   case $FLAG in
     "-i" | "--incremental")
+      i=$((i-2))
       N=1
     ;;
     "-ns" | "--namespace")
