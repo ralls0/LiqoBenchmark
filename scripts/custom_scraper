@@ -117,6 +117,8 @@ do
   fi
 
   nameFile="${prefix}uptime_${_date}.logs"
+  result=$(uptime)
+  echo $result > ./metrics/$nameFile
 
   sleep 5
 
