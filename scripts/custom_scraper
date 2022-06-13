@@ -11,18 +11,17 @@ while [[ i -lt $# ]]; do
   FLAG="$(cut -d ' ' -f $i <<< $@)"
   i=$((i+1))
   FVALUE="$(cut -d ' ' -f $i <<< $@)" 
-  i=$((i+1))
   echo -e "[i] Parse ${FLAG} ${FVALUE}"
   case $FLAG in
     "-i" | "--incremental")
-      i=$((i-2))
+      i=$((i-1))
       N=1
     ;;
     "-ns" | "--namespace")
       NS=$FVALUE
     ;;
     "--contexts")
-      i=$((i-2))
+      i=$((i-1))
 
       echo "Insert the number of contexts: "
       read NCONTEXT
@@ -60,7 +59,8 @@ do
   echo "$(date)"
   _date=$(date +%s)
   prefix=""
-  if [[ $N -gt 0 ]]
+  _zero=0
+  if (( N > _zero ))
   then
     prefix="${N}_"
     N=$((N+1))
