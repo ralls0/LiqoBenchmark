@@ -1,16 +1,7 @@
 #!/bin/bash
 
-function helper() {
-  echo -e "This is a custom scraper for the Liqo Benchmark\n"
-  echo "Usage:"
-  echo -e "./custom_scraper [flags]\n"
-  echo "Flags:"
-}
-
 NS="default"
 N=-1
-NCLUSTER=none
-declare -a clusters
 NCONTEXT=none
 declare -a contexts
 
@@ -29,37 +20,12 @@ while [[ i -lt $# ]]; do
     "-ns" | "--namespace")
       NS=$FVALUE
     ;;
-    "--clusters")
-
-      if [[ $NCONTEXT != "none" ]]
-      then
-        echo "[e] Error: just one between --clusters and --contexts can be used"
-        exit 1;
-      fi
-
-      i=$((i-2))
-      echo "Insert the number of clusters: "
-      read NCLUSTER
-      j=0
-      while [[ j -lt NCLUSTER ]]
-      do
-        echo "Insert the alias to change KUBECONFIG file: "
-        read clusters[j]
-        j=$((j+1))
-      done
-      echo "All clusters: ${clusters[@]}"
-    ;;
     "--contexts")
-
-      if [[ $NCLUSTER != "none" ]]
-      then
-        echo "[e] Error: just one between --clusters and --contexts can be used"
-        exit 1;
-      fi
-
       i=$((i-2))
+
       echo "Insert the number of contexts: "
       read NCONTEXT
+
       j=0
       while [[ j -lt NCONTEXT ]]
       do
@@ -74,6 +40,9 @@ while [[ i -lt $# ]]; do
       echo "Usage:"
       echo -e "./custom_scraper [flags]\n"
       echo "Flags:"
+      echo -e "\t-i\t--incremental\t\t\tAdd an incremental number when the script store the data"
+      echo -e "\t-ns\t--namespace\t\t\tNamespace of the application"
+      echo -e "\t--contexts\t\t\tEnable multi-context"
 
       exit 1;
     ;;
@@ -101,20 +70,6 @@ do
 
   nameFile="${prefix}deploy_${_date}.logs"
 
-  if [[ "$NCLUSTER" != "none" ]]
-  then
-    result=""
-    j=0
-    while [[ j -lt NCLUSTER ]]
-    do
-      clusters[j]
-      echo "[i] kubectl get deploy -n $NS"
-      result="$result$(kubectl get deploy -n $NS)"
-      j=$((j+1))
-    done
-    echo $result > ./$nameFile
-  fi
-
   if [[ "$NCONTEXT" != "none" ]]
   then
     result=""
@@ -126,28 +81,11 @@ do
       j=$((j+1))
     done
     echo $result > ./$nameFile
-  fi
-
-  if [[ "$NC" == "none" -a "$NCC" == "none" ]]
-  then
+  else
     kubectl get deploy -n $NS > ./$nameFile
   fi
 
   nameFile="${prefix}hpa_${_date}.logs"
-
-  if [[ "$NCLUSTER" != "none" ]]
-  then
-    result=""
-    j=0
-    while [[ j -lt NCLUSTER ]]
-    do
-      clusters[j]
-      echo "[i] kubectl get hpa -n $NS"
-      result="$result$(kubectl get hpa -n $NS)"
-      j=$((j+1))
-    done
-    echo $result > ./$nameFile
-  fi
 
   if [[ "$NCONTEXT" != "none" ]]
   then
@@ -160,10 +98,7 @@ do
       j=$((j+1))
     done
     echo $result > ./$nameFile
-  fi
-
-  if [[ "$NC" == "none" -a "$NCC" == "none" ]]
-  then
+  else
     kubectl get hpa -n $NS > ./$nameFile
   fi
 
