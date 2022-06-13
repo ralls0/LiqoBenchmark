@@ -54,7 +54,7 @@ done
 
 mkdir metrics
 
-while 1
+while true
 do
   echo "$(date)"
   _date=$(date +%s)
