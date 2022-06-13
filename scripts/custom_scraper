@@ -82,7 +82,14 @@ do
     done
     echo $result > ./metrics/$nameFile
   else
-    kubectl get deploy -n $NS > ./$nameFile
+    result=$(kubectl get deploy -n $NS)
+
+    if [[ "$result" == "" ]]
+    then
+      echo "[i] No deploy resources found"
+    else
+      echo $result > ./metrics/$nameFile
+    fi
   fi
 
   nameFile="${prefix}hpa_${_date}.logs"
@@ -99,7 +106,14 @@ do
     done
     echo $result > ./metrics/$nameFile
   else
-    kubectl get hpa -n $NS > ./$nameFile
+    result=$(kubectl get hpa -n $NS)
+
+    if [[ "$result" == "" ]]
+    then
+      echo "[i] No hpa resources found"
+    else
+      echo $result > ./metrics/$nameFile
+    fi
   fi
 
   nameFile="${prefix}uptime_${_date}.logs"
