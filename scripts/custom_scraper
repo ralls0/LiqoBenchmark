@@ -52,7 +52,7 @@ while [[ i -lt $# ]]; do
   esac
 done
 
-mkdir metrics
+mkdir -p metrics
 
 while true
 do
@@ -80,7 +80,7 @@ do
       result="$result$(kubectl get deploy -n $NS --context=${contexts[$j]})"
       j=$((j+1))
     done
-    echo $result > ./$nameFile
+    echo $result > ./metrics/$nameFile
   else
     kubectl get deploy -n $NS > ./$nameFile
   fi
@@ -97,7 +97,7 @@ do
       result="$result$(kubectl get hpa -n $NS --context=${contexts[$j]})"
       j=$((j+1))
     done
-    echo $result > ./$nameFile
+    echo $result > ./metrics/$nameFile
   else
     kubectl get hpa -n $NS > ./$nameFile
   fi
