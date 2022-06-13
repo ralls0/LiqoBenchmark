@@ -58,6 +58,16 @@ sudo growpart /dev/vda 5
 sudo resize2fs /dev/vda5
 ```
 
+Disable swap:
+
+```bash
+free -h
+sudo swapoff -a
+
+#Check
+free -h
+```
+
 First things first, I'm going to install some extra tools, and all the necessary dependencies on all the VMs:
 
 ```bash
