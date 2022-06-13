@@ -60,9 +60,10 @@ do
   echo "$(date)"
   _date=$(date +%s)
   prefix=""
-  if [[ "$N" -gt "0" ]]
+  if [[ $N -gt 0 ]]
   then
     prefix="${N}_"
+    N=((N+1))
   fi
 
   echo "[i] curl -o ./metrics/$nameFile http://127.0.0.1:9646/metrics"
