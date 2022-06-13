@@ -1,0 +1,174 @@
+#!/bin/bash
+
+function helper() {
+  echo -e "This is a custom scraper for the Liqo Benchmark\n"
+  echo "Usage:"
+  echo -e "./custom_scraper [flags]\n"
+  echo "Flags:"
+}
+
+NS="default"
+N=-1
+NCLUSTER=none
+declare -a clusters
+NCONTEXT=none
+declare -a contexts
+
+i=0
+while [[ i -lt $# ]]; do
+  i=$((i+1))
+  FLAG="$(cut -d ' ' -f $i <<< $@)"
+  i=$((i+1))
+  FVALUE="$(cut -d ' ' -f $i <<< $@)" 
+  i=$((i+1))
+  echo -e "[i] Parse ${FLAG} ${FVALUE}"
+  case $FLAG in
+    "-i" | "--incremental")
+      N=1
+    ;;
+    "-ns" | "--namespace")
+      NS=$FVALUE
+    ;;
+    "--clusters")
+
+      if [[ $NCONTEXT != "none" ]]
+      then
+        echo "[e] Error: just one between --clusters and --contexts can be used"
+        exit 1;
+      fi
+
+      i=$((i-2))
+      echo "Insert the number of clusters: "
+      read NCLUSTER
+      j=0
+      while [[ j -lt NCLUSTER ]]
+      do
+        echo "Insert the alias to change KUBECONFIG file: "
+        read clusters[j]
+        j=$((j+1))
+      done
+      echo "All clusters: ${clusters[@]}"
+    ;;
+    "--contexts")
+
+      if [[ $NCLUSTER != "none" ]]
+      then
+        echo "[e] Error: just one between --clusters and --contexts can be used"
+        exit 1;
+      fi
+
+      i=$((i-2))
+      echo "Insert the number of contexts: "
+      read NCONTEXT
+      j=0
+      while [[ j -lt NCONTEXT ]]
+      do
+        echo "Insert the name of the context: "
+        read contexts[j]
+        j=$((j+1))
+      done
+      echo "All contexts: ${contexts[@]}"
+    ;;
+    "-h" | "--help")
+      echo -e "This is a custom scraper for the Liqo Benchmark\n"
+      echo "Usage:"
+      echo -e "./custom_scraper [flags]\n"
+      echo "Flags:"
+
+      exit 1;
+    ;;
+    *)
+      echo "not found"
+    ;;
+  esac
+done
+
+mkdir metrics
+
+while 1
+do
+  echo "$(date)"
+  _date=$(date +%s)
+  prefix=""
+  if [[ "$N" -gt "0" ]]
+  then
+    prefix="${N}_"
+  fi
+
+  echo "[i] curl -o ./metrics/$nameFile http://127.0.0.1:9646/metrics"
+  nameFile="${prefix}locust_exporter_${_date}.logs"
+  curl -o ./metrics/$nameFile http://127.0.0.1:9646/metrics
+
+  nameFile="${prefix}deploy_${_date}.logs"
+
+  if [[ "$NCLUSTER" != "none" ]]
+  then
+    result=""
+    j=0
+    while [[ j -lt NCLUSTER ]]
+    do
+      clusters[j]
+      echo "[i] kubectl get deploy -n $NS"
+      result="$result$(kubectl get deploy -n $NS)"
+      j=$((j+1))
+    done
+    echo $result > ./$nameFile
+  fi
+
+  if [[ "$NCONTEXT" != "none" ]]
+  then
+    result=""
+    j=0
+    while [[ j -lt NCONTEXT ]]
+    do
+      echo "[i] kubectl get deploy -n $NS --context=${contexts[$j]}"
+      result="$result$(kubectl get deploy -n $NS --context=${contexts[$j]})"
+      j=$((j+1))
+    done
+    echo $result > ./$nameFile
+  fi
+
+  if [[ "$NC" == "none" -a "$NCC" == "none" ]]
+  then
+    kubectl get deploy -n $NS > ./$nameFile
+  fi
+
+  nameFile="${prefix}hpa_${_date}.logs"
+
+  if [[ "$NCLUSTER" != "none" ]]
+  then
+    result=""
+    j=0
+    while [[ j -lt NCLUSTER ]]
+    do
+      clusters[j]
+      echo "[i] kubectl get hpa -n $NS"
+      result="$result$(kubectl get hpa -n $NS)"
+      j=$((j+1))
+    done
+    echo $result > ./$nameFile
+  fi
+
+  if [[ "$NCONTEXT" != "none" ]]
+  then
+    result=""
+    j=0
+    while [[ j -lt NCONTEXT ]]
+    do
+      echo "[i] kubectl get hpa -n $NS --context=${contexts[$j]}"
+      result="$result$(kubectl get hpa -n $NS --context=${contexts[$j]})"
+      j=$((j+1))
+    done
+    echo $result > ./$nameFile
+  fi
+
+  if [[ "$NC" == "none" -a "$NCC" == "none" ]]
+  then
+    kubectl get hpa -n $NS > ./$nameFile
+  fi
+
+  nameFile="${prefix}uptime_${_date}.logs"
+
+  sleep 5
+
+done
