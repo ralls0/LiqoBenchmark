@@ -5,6 +5,7 @@ from tokenize import String
 from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
+from sympy import rotations
 
 def getFileName(check: String, itemList: List):
   """
@@ -90,15 +91,22 @@ def getP50(values):
   return p50
 
 def getDeploy(values):
+  sum = 0
   deployment = {}
   deploy = values[0].get("deploy").keys()
 
+  deployment["running_pods"] = []
   for d in deploy:
     deployment[d] = []
     for v in values:
       deployment[d].append(int(v["deploy"].get(d)))
+
+  for v in values:
+    for d in deploy:
+      sum += int(v["deploy"].get(d))
+    deployment["running_pods"].append(sum)
+    sum = 0
   
-  print(deployment)
   return deployment
 
 if __name__ == "__main__":
@@ -145,12 +153,21 @@ if __name__ == "__main__":
   plot1.set_title("Response Time Percentile 95")
   plot1.set_xlabel("Time")
   plot1.set_ylabel("ms")
-  plot1.plot(xpoints, yP95)
-  plot1.plot(xpoints, yP50)
+  plot1.plot(xpoints, yP95, label = "P95")
+  plot1.plot(xpoints, yP50, label = "P50")
+
+  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
+  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot1.legend()
 
   plot2.set_title("Deployments")
   plot2.set_xlabel("Time")
   for d in deploy:
-    plot2.plot(xpoints,  np.array(deploy[d]))
+    plot2.plot(xpoints,  np.array(deploy[d]), label = d)
   
+  plot2.set_xticklabels(xpoints, rotation=45, fontsize="small")
+  plot2.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot2.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
+  plot2.legend()
+
   plt.show()
