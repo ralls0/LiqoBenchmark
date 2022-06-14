@@ -49,7 +49,7 @@ Before starting to run the demos you should have installed some software on your
 
 For my tests, I’m going to setup the clusters on the virtual machines hosted on [CrownLabs](https://crownlabs.polito.it/).
 
-> VMs: Ubuntu Desktop 20.04 with 8 CORE, 8 GB of RAM, and 50 GB of disk.
+> VMs: Ubuntu Desktop 20.04 with 32 CORE, 32 GB of RAM, and 50 GB of disk.
 > NOTE: By default, not all 25 GB are available. You can use these commands to extend the disk:
 
 ```bash

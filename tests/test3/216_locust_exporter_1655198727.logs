@@ -1,0 +1,305 @@
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 6.242e-05
+go_gc_duration_seconds{quantile="0.25"} 0.00020087
+go_gc_duration_seconds{quantile="0.5"} 0.000257547
+go_gc_duration_seconds{quantile="0.75"} 0.0003682
+go_gc_duration_seconds{quantile="1"} 0.000888322
+go_gc_duration_seconds_sum 0.006493626
+go_gc_duration_seconds_count 20
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 9
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.18.2"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 3.378112e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 5.6595784e+07
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 4256
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 467375
+# HELP go_memstats_gc_cpu_fraction The fraction of this program's available CPU time used by the GC since the program started.
+# TYPE go_memstats_gc_cpu_fraction gauge
+go_memstats_gc_cpu_fraction 5.645618856815909e-06
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 5.13144e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 3.378112e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 3.080192e+06
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 4.390912e+06
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 21644
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 2.37568e+06
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 7.471104e+06
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.65519867408755e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 489019
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 38400
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 46800
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 138856
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 179520
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 4.194304e+06
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.669552e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 917504
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 917504
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 1.5420176e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 13
+# HELP locust_requests_avg_content_length 
+# TYPE locust_requests_avg_content_length gauge
+locust_requests_avg_content_length{method="",name="Aggregated"} 8759.816463166251
+locust_requests_avg_content_length{method="GET",name="/"} 10053.997211550379
+locust_requests_avg_content_length{method="GET",name="/cart"} 6664.279929422144
+locust_requests_avg_content_length{method="GET",name="/product/0PUK6V6EV0"} 7677.227315839393
+locust_requests_avg_content_length{method="GET",name="/product/1YMWWN1N4O"} 7696.943598055105
+locust_requests_avg_content_length{method="GET",name="/product/2ZYFJ3GM2N"} 7694.973371831889
+locust_requests_avg_content_length{method="GET",name="/product/66VCHSJNUP"} 7661.504897314376
+locust_requests_avg_content_length{method="GET",name="/product/6E92ZMYYFZ"} 7651.012913385826
+locust_requests_avg_content_length{method="GET",name="/product/9SIQT8TOJO"} 7700.15623987034
+locust_requests_avg_content_length{method="GET",name="/product/L9ECAV7KIM"} 7663.89057350033
+locust_requests_avg_content_length{method="GET",name="/product/LS4PSXUNUM"} 7666.193651811478
+locust_requests_avg_content_length{method="GET",name="/product/OLJCESPC7Z"} 7698.109707446809
+locust_requests_avg_content_length{method="POST",name="/cart"} 16260.396185833095
+locust_requests_avg_content_length{method="POST",name="/cart/checkout"} 6581.757192174914
+locust_requests_avg_content_length{method="POST",name="/setCurrency"} 10066.324123273114
+# HELP locust_requests_avg_response_time 
+# TYPE locust_requests_avg_response_time gauge
+locust_requests_avg_response_time{method="",name="Aggregated"} 1334.1232296564074
+locust_requests_avg_response_time{method="GET",name="/"} 1495.4123970195867
+locust_requests_avg_response_time{method="GET",name="/cart"} 1100.5273278705276
+locust_requests_avg_response_time{method="GET",name="/product/0PUK6V6EV0"} 1133.0988183547263
+locust_requests_avg_response_time{method="GET",name="/product/1YMWWN1N4O"} 1154.49587261782
+locust_requests_avg_response_time{method="GET",name="/product/2ZYFJ3GM2N"} 1143.600030603142
+locust_requests_avg_response_time{method="GET",name="/product/66VCHSJNUP"} 1220.0051431680786
+locust_requests_avg_response_time{method="GET",name="/product/6E92ZMYYFZ"} 1162.6471171971764
+locust_requests_avg_response_time{method="GET",name="/product/9SIQT8TOJO"} 1194.5661692842682
+locust_requests_avg_response_time{method="GET",name="/product/L9ECAV7KIM"} 1202.3046031697484
+locust_requests_avg_response_time{method="GET",name="/product/LS4PSXUNUM"} 1160.039324166728
+locust_requests_avg_response_time{method="GET",name="/product/OLJCESPC7Z"} 1179.5751623749964
+locust_requests_avg_response_time{method="POST",name="/cart"} 1462.7714783290796
+locust_requests_avg_response_time{method="POST",name="/cart/checkout"} 1414.7662925566697
+locust_requests_avg_response_time{method="POST",name="/setCurrency"} 1716.8744520475466
+# HELP locust_requests_current_fail_per_sec 
+# TYPE locust_requests_current_fail_per_sec gauge
+locust_requests_current_fail_per_sec{method="",name="Aggregated"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/cart"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/0PUK6V6EV0"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/1YMWWN1N4O"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/2ZYFJ3GM2N"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/66VCHSJNUP"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/6E92ZMYYFZ"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/9SIQT8TOJO"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/L9ECAV7KIM"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/LS4PSXUNUM"} 0
+locust_requests_current_fail_per_sec{method="GET",name="/product/OLJCESPC7Z"} 0
+locust_requests_current_fail_per_sec{method="POST",name="/cart"} 0
+locust_requests_current_fail_per_sec{method="POST",name="/cart/checkout"} 0
+locust_requests_current_fail_per_sec{method="POST",name="/setCurrency"} 0
+# HELP locust_requests_current_response_time_percentile_50 
+# TYPE locust_requests_current_response_time_percentile_50 gauge
+locust_requests_current_response_time_percentile_50 890
+# HELP locust_requests_current_response_time_percentile_95 
+# TYPE locust_requests_current_response_time_percentile_95 gauge
+locust_requests_current_response_time_percentile_95 1400
+# HELP locust_requests_current_rps 
+# TYPE locust_requests_current_rps gauge
+locust_requests_current_rps{method="",name="Aggregated"} 213.5
+locust_requests_current_rps{method="GET",name="/"} 36.6
+locust_requests_current_rps{method="GET",name="/cart"} 53.4
+locust_requests_current_rps{method="GET",name="/product/0PUK6V6EV0"} 5.8
+locust_requests_current_rps{method="GET",name="/product/1YMWWN1N4O"} 8.8
+locust_requests_current_rps{method="GET",name="/product/2ZYFJ3GM2N"} 8
+locust_requests_current_rps{method="GET",name="/product/66VCHSJNUP"} 6.8
+locust_requests_current_rps{method="GET",name="/product/6E92ZMYYFZ"} 6.4
+locust_requests_current_rps{method="GET",name="/product/9SIQT8TOJO"} 8.1
+locust_requests_current_rps{method="GET",name="/product/L9ECAV7KIM"} 5.4
+locust_requests_current_rps{method="GET",name="/product/LS4PSXUNUM"} 6.5
+locust_requests_current_rps{method="GET",name="/product/OLJCESPC7Z"} 5.7
+locust_requests_current_rps{method="POST",name="/cart"} 14.8
+locust_requests_current_rps{method="POST",name="/cart/checkout"} 14.1
+locust_requests_current_rps{method="POST",name="/setCurrency"} 33.1
+# HELP locust_requests_fail_ratio 
+# TYPE locust_requests_fail_ratio gauge
+locust_requests_fail_ratio 0
+# HELP locust_requests_max_response_time 
+# TYPE locust_requests_max_response_time gauge
+locust_requests_max_response_time{method="",name="Aggregated"} 10314
+locust_requests_max_response_time{method="GET",name="/"} 9893
+locust_requests_max_response_time{method="GET",name="/cart"} 7075
+locust_requests_max_response_time{method="GET",name="/product/0PUK6V6EV0"} 5529
+locust_requests_max_response_time{method="GET",name="/product/1YMWWN1N4O"} 6598
+locust_requests_max_response_time{method="GET",name="/product/2ZYFJ3GM2N"} 7282
+locust_requests_max_response_time{method="GET",name="/product/66VCHSJNUP"} 6016
+locust_requests_max_response_time{method="GET",name="/product/6E92ZMYYFZ"} 6166
+locust_requests_max_response_time{method="GET",name="/product/9SIQT8TOJO"} 6167
+locust_requests_max_response_time{method="GET",name="/product/L9ECAV7KIM"} 6024
+locust_requests_max_response_time{method="GET",name="/product/LS4PSXUNUM"} 5798
+locust_requests_max_response_time{method="GET",name="/product/OLJCESPC7Z"} 6105
+locust_requests_max_response_time{method="POST",name="/cart"} 7820
+locust_requests_max_response_time{method="POST",name="/cart/checkout"} 7087
+locust_requests_max_response_time{method="POST",name="/setCurrency"} 10314
+# HELP locust_requests_median_response_time 
+# TYPE locust_requests_median_response_time gauge
+locust_requests_median_response_time{method="",name="Aggregated"} 790
+locust_requests_median_response_time{method="GET",name="/"} 910
+locust_requests_median_response_time{method="GET",name="/cart"} 680
+locust_requests_median_response_time{method="GET",name="/product/0PUK6V6EV0"} 700
+locust_requests_median_response_time{method="GET",name="/product/1YMWWN1N4O"} 710
+locust_requests_median_response_time{method="GET",name="/product/2ZYFJ3GM2N"} 700
+locust_requests_median_response_time{method="GET",name="/product/66VCHSJNUP"} 700
+locust_requests_median_response_time{method="GET",name="/product/6E92ZMYYFZ"} 710
+locust_requests_median_response_time{method="GET",name="/product/9SIQT8TOJO"} 710
+locust_requests_median_response_time{method="GET",name="/product/L9ECAV7KIM"} 710
+locust_requests_median_response_time{method="GET",name="/product/LS4PSXUNUM"} 700
+locust_requests_median_response_time{method="GET",name="/product/OLJCESPC7Z"} 710
+locust_requests_median_response_time{method="POST",name="/cart"} 980
+locust_requests_median_response_time{method="POST",name="/cart/checkout"} 790
+locust_requests_median_response_time{method="POST",name="/setCurrency"} 1100
+# HELP locust_requests_min_response_time 
+# TYPE locust_requests_min_response_time gauge
+locust_requests_min_response_time{method="",name="Aggregated"} 17
+locust_requests_min_response_time{method="GET",name="/"} 26
+locust_requests_min_response_time{method="GET",name="/cart"} 19
+locust_requests_min_response_time{method="GET",name="/product/0PUK6V6EV0"} 20
+locust_requests_min_response_time{method="GET",name="/product/1YMWWN1N4O"} 19
+locust_requests_min_response_time{method="GET",name="/product/2ZYFJ3GM2N"} 21
+locust_requests_min_response_time{method="GET",name="/product/66VCHSJNUP"} 22
+locust_requests_min_response_time{method="GET",name="/product/6E92ZMYYFZ"} 17
+locust_requests_min_response_time{method="GET",name="/product/9SIQT8TOJO"} 22
+locust_requests_min_response_time{method="GET",name="/product/L9ECAV7KIM"} 20
+locust_requests_min_response_time{method="GET",name="/product/LS4PSXUNUM"} 23
+locust_requests_min_response_time{method="GET",name="/product/OLJCESPC7Z"} 22
+locust_requests_min_response_time{method="POST",name="/cart"} 30
+locust_requests_min_response_time{method="POST",name="/cart/checkout"} 46
+locust_requests_min_response_time{method="POST",name="/setCurrency"} 31
+# HELP locust_requests_num_failures 
+# TYPE locust_requests_num_failures gauge
+locust_requests_num_failures{method="",name="Aggregated"} 0
+locust_requests_num_failures{method="GET",name="/"} 0
+locust_requests_num_failures{method="GET",name="/cart"} 0
+locust_requests_num_failures{method="GET",name="/product/0PUK6V6EV0"} 0
+locust_requests_num_failures{method="GET",name="/product/1YMWWN1N4O"} 0
+locust_requests_num_failures{method="GET",name="/product/2ZYFJ3GM2N"} 0
+locust_requests_num_failures{method="GET",name="/product/66VCHSJNUP"} 0
+locust_requests_num_failures{method="GET",name="/product/6E92ZMYYFZ"} 0
+locust_requests_num_failures{method="GET",name="/product/9SIQT8TOJO"} 0
+locust_requests_num_failures{method="GET",name="/product/L9ECAV7KIM"} 0
+locust_requests_num_failures{method="GET",name="/product/LS4PSXUNUM"} 0
+locust_requests_num_failures{method="GET",name="/product/OLJCESPC7Z"} 0
+locust_requests_num_failures{method="POST",name="/cart"} 0
+locust_requests_num_failures{method="POST",name="/cart/checkout"} 0
+locust_requests_num_failures{method="POST",name="/setCurrency"} 0
+# HELP locust_requests_num_requests 
+# TYPE locust_requests_num_requests gauge
+locust_requests_num_requests{method="",name="Aggregated"} 95741
+locust_requests_num_requests{method="GET",name="/"} 16138
+locust_requests_num_requests{method="GET",name="/cart"} 22670
+locust_requests_num_requests{method="GET",name="/product/0PUK6V6EV0"} 3163
+locust_requests_num_requests{method="GET",name="/product/1YMWWN1N4O"} 3085
+locust_requests_num_requests{method="GET",name="/product/2ZYFJ3GM2N"} 3117
+locust_requests_num_requests{method="GET",name="/product/66VCHSJNUP"} 3165
+locust_requests_num_requests{method="GET",name="/product/6E92ZMYYFZ"} 3175
+locust_requests_num_requests{method="GET",name="/product/9SIQT8TOJO"} 3085
+locust_requests_num_requests{method="GET",name="/product/L9ECAV7KIM"} 3034
+locust_requests_num_requests{method="GET",name="/product/LS4PSXUNUM"} 3119
+locust_requests_num_requests{method="GET",name="/product/OLJCESPC7Z"} 3008
+locust_requests_num_requests{method="POST",name="/cart"} 6974
+locust_requests_num_requests{method="POST",name="/cart/checkout"} 6952
+locust_requests_num_requests{method="POST",name="/setCurrency"} 15056
+# HELP locust_running The current state of the execution (0 = STOPPED 1 = HATCHING 2 = RUNNING,).
+# TYPE locust_running gauge
+locust_running 2
+# HELP locust_up The current health status of the server (1 = UP, 0 = DOWN).
+# TYPE locust_up gauge
+locust_up 1
+# HELP locust_users The current number of users.
+# TYPE locust_users gauge
+locust_users 200
+# HELP locust_workers_count The current number of workers.
+# TYPE locust_workers_count gauge
+locust_workers_count 0
+# HELP locust_workers_hatching_count The current number of hatching workers.
+# TYPE locust_workers_hatching_count gauge
+locust_workers_hatching_count 0
+# HELP locust_workers_missing_count The current number of missing workers.
+# TYPE locust_workers_missing_count gauge
+locust_workers_missing_count 0
+# HELP locust_workers_running_count The current number of running workers.
+# TYPE locust_workers_running_count gauge
+locust_workers_running_count 0
+# HELP locustexporter_build_info A metric with a constant '1' value labeled by version, revision, branch, and goversion from which locustexporter was built.
+# TYPE locustexporter_build_info gauge
+locustexporter_build_info{branch="",goversion="go1.18.2",revision="",version=""} 1
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 1.33
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 10
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 1.4843904e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.65519729779e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 7.3080832e+08
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP promhttp_metric_handler_requests_in_flight Current number of scrapes being served.
+# TYPE promhttp_metric_handler_requests_in_flight gauge
+promhttp_metric_handler_requests_in_flight 1
+# HELP promhttp_metric_handler_requests_total Total number of scrapes by HTTP status code.
+# TYPE promhttp_metric_handler_requests_total counter
+promhttp_metric_handler_requests_total{code="200"} 215
+promhttp_metric_handler_requests_total{code="500"} 0
+promhttp_metric_handler_requests_total{code="503"} 0
