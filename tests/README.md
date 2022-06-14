@@ -17,3 +17,9 @@ Online Boutique on a multi-cluster with Liqo, and Linkerd as Service Mesh provid
 Online Boutique on a multi-cluster with Linkerd:
 
 ![metrics_test4](./test4/metrics_test4.png)
+
+## Test 5
+
+Online Boutique on a cluster with Linkerd:
+
+![metrics_test5](./test5/metrics_test5.png)
