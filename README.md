@@ -297,7 +297,9 @@ source <(liqoctl completion bash) >> $HOME/.bashrc
 
 liqoctl install kind --cluster-name cluster2
 lc3
+
 liqoctl install kind --cluster-name cluster3
+liqo generate peer-command
 lc2
 ```
 
@@ -388,7 +390,13 @@ xclip -sel clip < ./kubernetes-manifests/grafana-dashboard.json
 You can deploy the Kubernetes Metrics Server on the cluster you created with the following commands:
 
 ```bash
+lc2
 kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+
+lc3
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+
+lc2
 ```
 
 Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:

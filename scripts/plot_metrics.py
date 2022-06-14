@@ -110,7 +110,7 @@ def getDeploy(values):
   return deployment
 
 if __name__ == "__main__":
-  path = "/Users/rallso/Desktop/test3/" # os.getcwd()+"/"
+  path = "/Users/rallso/Desktop/test2/" # os.getcwd()+"/"
   # print(f"path: {path}")
 
   values = []
