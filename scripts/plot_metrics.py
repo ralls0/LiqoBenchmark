@@ -1,7 +1,10 @@
 import os, sys
 import re
+from datetime import *
 from tokenize import String
 from typing import List
+import matplotlib.pyplot as plt
+import numpy as np
 
 def getFileName(check: String, itemList: List):
   """
@@ -47,7 +50,7 @@ def getLoadAverage(fileName: String, path: String):
   
   return line
 
-def getResponseTime(fileName: String, path: String):
+def getResponseTimeP95(fileName: String, path: String):
   p95 = 0
   with open(f"{path}{fileName}") as f:
     for line in f:
@@ -56,7 +59,34 @@ def getResponseTime(fileName: String, path: String):
   
   return p95
 
+def getResponseTimeP50(fileName: String, path: String):
+  p50 = 0
+  with open(f"{path}{fileName}") as f:
+    for line in f:
+      if re.search(f"^locust_requests_current_response_time_percentile_50.*", line):
+        p50 = float((line.split(" "))[1])
+  
+  return p50
 
+def getTime(values):
+  _date = []
+  for v in values:
+    _dt = datetime.fromtimestamp(int(v.get("timestamp")))
+    _hour = _dt.hour
+    _minute = _dt.minute
+    _date.append(f"{_hour}:{_minute}")
+  
+  return _date
+
+def getP95(values):
+  p95 = [v.get("response_time_percentile_95") for v in values]
+  
+  return p95
+
+def getP50(values):
+  p50 = [v.get("response_time_percentile_50") for v in values]
+  
+  return p50
 
 if __name__ == "__main__":
   path = "/Users/rallso/Desktop/metrics/" # os.getcwd()+"/"
@@ -80,8 +110,24 @@ if __name__ == "__main__":
 
     value["deploy"] = getDeployInfo(f"{n}_deploy_{timestampFile}.logs", path)
     value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
-    value["response_time_percentile_95"] = getResponseTime(f"{n}_locust_exporter_{timestampFile}.logs", path)
+    value["response_time_percentile_95"] = getResponseTimeP95(f"{n}_locust_exporter_{timestampFile}.logs", path)
+    value["response_time_percentile_50"] = getResponseTimeP50(f"{n}_locust_exporter_{timestampFile}.logs", path)
     #value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
     values.append(value)
   
   print(f"values: {values}")
+
+  metricsTime = getTime(values)
+  p95 = getP95(values)
+  p50 = getP50(values)
+
+  xpoints = np.array(metricsTime)
+  yP95 = np.array(p95)
+  yP50 = np.array(p50)
+
+  plt.title("Response Time Percentile 95")
+  plt.xlabel("Time")
+  plt.ylabel("ms")
+  plt.plot(xpoints, yP95)
+  plt.plot(xpoints, yP50)
+  plt.show()
