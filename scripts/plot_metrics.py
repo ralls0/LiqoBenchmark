@@ -19,16 +19,29 @@ def getFileName(check: String, itemList: List):
 def extractDigits(lst):
   newLst = []
   el = []
+  nlst = lst
+  lst = []
+  print(nlst)
+  for n, e in enumerate(nlst):
+    if re.search(f".+NAME$", e):
+      lst.append(e[0:len(e)-4])
+      lst.append("NAME")
+    else:
+      lst.append(e)
+
+  print(lst)
   for n, e in enumerate(lst):
-    if n%5 == 0 and n != 0:
+    if n%5 == 0:
       if el != []:
         newLst.append(el)
         el = []
-      el.append(e)
+      if re.search(f"[^NAME|READY|UP\-TO\-DATE|AVAILABLE|AGE]", e):
+        el.append(e)
     else:
       if re.search(f"[^NAME|READY|UP\-TO\-DATE|AVAILABLE|AGE]", e):
         el.append(e)
 
+  print(newLst)
   return newLst
 
 def getDeployInfo(fileName: String, path: String):
