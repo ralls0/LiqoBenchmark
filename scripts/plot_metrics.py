@@ -1,11 +1,11 @@
 import os, sys
 import re
+import json
 from datetime import *
 from tokenize import String
 from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
-from sympy import rotations
 
 def getFileName(check: String, itemList: List):
   """
@@ -110,13 +110,13 @@ def getDeploy(values):
   return deployment
 
 if __name__ == "__main__":
-  path = "/Users/rallso/Desktop/metrics/" # os.getcwd()+"/"
+  path = "/Users/rallso/Desktop/test3/" # os.getcwd()+"/"
   # print(f"path: {path}")
 
   values = []
 
   print("[i] Retrieve the list of the file")
-  listDir = os.listdir("/Users/rallso/Desktop/metrics")
+  listDir = os.listdir(path)
   # print(f"list type: {type(listDir)}, listDir: {listDir}")
   lastIndex = int(input("Insert the last file name index: "))+1
 
@@ -136,7 +136,9 @@ if __name__ == "__main__":
     #value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
     values.append(value)
   
-  #print(f"values: {values}")
+  fileName = input("Insert the name of the file in which you want to store data: ")
+  with open(f"{path}{fileName}.json","w+") as f:
+    f.write(json.dumps(values))
 
   metricsTime = getTime(values)
   p95 = getP95(values)
@@ -150,7 +152,7 @@ if __name__ == "__main__":
   plot1 = plt.subplot2grid((2, 1), (0, 0)) #
   plot2 = plt.subplot2grid((2, 1), (1, 0)) #
 
-  plot1.set_title("Response Time Percentile 95")
+  plot1.set_title("Response Time")
   plot1.set_xlabel("Time")
   plot1.set_ylabel("ms")
   plot1.plot(xpoints, yP95, label = "P95")
