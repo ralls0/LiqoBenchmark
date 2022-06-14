@@ -74,7 +74,8 @@ def getTime(values):
     _dt = datetime.fromtimestamp(int(v.get("timestamp")))
     _hour = _dt.hour
     _minute = _dt.minute
-    _date.append(f"{_hour}:{_minute}")
+    _sec = _dt.second
+    _date.append(f"{_hour}:{_minute}:{_sec}")
   
   return _date
 
@@ -87,6 +88,18 @@ def getP50(values):
   p50 = [v.get("response_time_percentile_50") for v in values]
   
   return p50
+
+def getDeploy(values):
+  deployment = {}
+  deploy = values[0].get("deploy").keys()
+
+  for d in deploy:
+    deployment[d] = []
+    for v in values:
+      deployment[d].append(int(v["deploy"].get(d)))
+  
+  print(deployment)
+  return deployment
 
 if __name__ == "__main__":
   path = "/Users/rallso/Desktop/metrics/" # os.getcwd()+"/"
@@ -115,7 +128,7 @@ if __name__ == "__main__":
     #value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
     values.append(value)
   
-  print(f"values: {values}")
+  #print(f"values: {values}")
 
   metricsTime = getTime(values)
   p95 = getP95(values)
@@ -124,10 +137,20 @@ if __name__ == "__main__":
   xpoints = np.array(metricsTime)
   yP95 = np.array(p95)
   yP50 = np.array(p50)
+  deploy = getDeploy(values)
 
-  plt.title("Response Time Percentile 95")
-  plt.xlabel("Time")
-  plt.ylabel("ms")
-  plt.plot(xpoints, yP95)
-  plt.plot(xpoints, yP50)
+  plot1 = plt.subplot2grid((2, 1), (0, 0)) #
+  plot2 = plt.subplot2grid((2, 1), (1, 0)) #
+
+  plot1.set_title("Response Time Percentile 95")
+  plot1.set_xlabel("Time")
+  plot1.set_ylabel("ms")
+  plot1.plot(xpoints, yP95)
+  plot1.plot(xpoints, yP50)
+
+  plot2.set_title("Deployments")
+  plot2.set_xlabel("Time")
+  for d in deploy:
+    plot2.plot(xpoints,  np.array(deploy[d]))
+  
   plt.show()
