@@ -38,6 +38,12 @@
     6. [Prometheus and Locust exporter](#prometheus-and-locust-exporter-3)
     7. [Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl](#deploying-the-kubernetes-metrics-server-on-a-cluster-using-kubectl-3)
     8. [HPA - Horizontal Pod Autoscaling](#hpa---horizontal-pod-autoscaling-3)
+8. [Test 5](#test-5)
+    1. [Creation of the Cluster](#creation-of-the-cluster-4)
+    2. [Linkerd installation](#linkerd-installation-2)
+    3. [Deploy of the application](#deploy-of-the-application-4)
+    4. [Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl](#deploying-the-kubernetes-metrics-server-on-a-cluster-using-kubectl-4)
+    5. [HPA - Horizontal Pod Autoscaling](#hpa---horizontal-pod-autoscaling-4)
 
 ## Intro
 
@@ -144,6 +150,7 @@ For these tests, you'll play with a [micro-services application provided by Goog
 2. Online Boutique on a multi-cluster with Liqo.
 3. Online Boutique on a multi-cluster with Liqo, and Linkerd as Service Mesh provider.
 4. Online Boutique on a multi-cluster with Linkerd.
+5. Online Boutique on a cluster with Linkerd.
 
 ## Test 1
 
@@ -165,6 +172,7 @@ lc1
 
 ```bash
 k create ns online-boutique
+
 k apply -f ./kubernetes-manifests/online-boutique/boutique-manifests.yaml -n online-boutique
 ```
 
@@ -920,4 +928,86 @@ Now, you can create the horizontal pod autoscaling resources.
 k --context=west -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu-west.yaml
 
 k --context=east -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu-east.yaml
+```
+
+## Test 5
+
+### Creation of the Cluster
+
+Before starting the test, you should create the cluster where you'll operate.
+
+```bash
+# Test 5
+sudo kind create cluster --name cluster8 --kubeconfig $HOME/.kube/configC8
+sudo chmod 644 $HOME/.kube/configC8
+echo "alias lc8=\"export KUBECONFIG=$HOME/.kube/configC8\"" >> $HOME/.bashrc
+
+source $HOME/.bashrc
+
+lc8
+```
+
+### Linkerd installation
+
+To install linkerd run:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
+export PATH=$PATH:$HOME/.linkerd2/bin
+
+# Linkerd
+linkerd install | kubectl apply -f -
+linkerd check
+```
+
+### Deploy of the application
+
+```bash
+kubectl create ns online-boutique
+
+cat ./kubernetes-manifests/online-boutique/boutique-manifests.yaml | linkerd inject - | kubectl -n online-boutique apply -f -
+
+linkerd -n online-boutique check --proxy
+```
+
+Once the demo application manifest is applied, you can observe the creation of the different pods. On the node column you can see if the pods are hosted by the local or remote cluster:
+
+```bash
+k get pods -n online-boutique -o wide
+```
+
+When all pods are running you can start the loadgenerator:
+
+```bash
+kubectl port-forward -n online-boutique service/loadgenerator 8089
+```
+
+I'm using 200 users with 1 second of spawn rate for my test.
+
+Now, you can check that losut-exporter is monitoring the loadgenerator resource.
+
+```bash
+kubectl port-forward -n online-boutique service/locust-exporter 9646
+```
+
+### Deploying the Kubernetes Metrics Server on a Cluster Using Kubectl
+
+You can deploy the Kubernetes Metrics Server on the cluster you created with the following commands:
+
+```bash
+kubectl apply -f ./kubernetes-manifests/metrics/ms-components.yaml
+```
+
+Confirm that the Kubernetes Metrics Server has been deployed successfully and is available by entering:
+
+```bash
+kubectl get deployment metrics-server -n kube-system
+```
+
+### HPA - Horizontal Pod Autoscaling
+
+Now, you can create the horizontal pod autoscaling resources.
+
+```bash
+k -n online-boutique apply -f ./kubernetes-manifests/hpa/hpa-manifest-cpu.yaml
 ```
