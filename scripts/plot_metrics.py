@@ -26,7 +26,7 @@ def extractDigits(lst):
         el = []
       el.append(e)
     else:
-      if n > 5:
+      if re.search(f"[^NAME|READY|UP\-TO\-DATE|AVAILABLE|AGE]", e):
         el.append(e)
 
   return newLst
@@ -110,7 +110,7 @@ def getDeploy(values):
   return deployment
 
 if __name__ == "__main__":
-  path = "/Users/rallso/Desktop/test2/" # os.getcwd()+"/"
+  path = "/Users/rallso/Desktop/test4/" # os.getcwd()+"/"
   # print(f"path: {path}")
 
   values = []
