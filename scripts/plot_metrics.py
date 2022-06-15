@@ -82,6 +82,15 @@ def getResponseTimeP50(fileName: String, path: String):
   
   return p50
 
+def getCurrentRPSAggregated(fileName: String, path: String):
+  rpsA = 0
+  with open(f"{path}{fileName}") as f:
+    for line in f:
+      if re.search(f"^locust_requests_current_rps.*Aggregated.*", line):
+        rpsA = float((line.split(" "))[1])
+  
+  return rpsA
+
 def getTime(values):
   _date = []
   for v in values:
@@ -103,6 +112,11 @@ def getP50(values):
   
   return p50
 
+def getRSPA(values):
+  rpsA = [v.get("current_rps_aggregated") for v in values]
+  
+  return rpsA
+
 def getDeploy(values):
   sum = 0
   deployment = {}
@@ -123,7 +137,7 @@ def getDeploy(values):
   return deployment
 
 if __name__ == "__main__":
-  path = "/Users/rallso/Desktop/test5/" # os.getcwd()+"/"
+  path = os.getcwd()+"/../tests/test3bis/" # "/Users/rallso/Desktop/test3/"
   # print(f"path: {path}")
 
   values = []
@@ -146,6 +160,7 @@ if __name__ == "__main__":
     value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
     value["response_time_percentile_95"] = getResponseTimeP95(f"{n}_locust_exporter_{timestampFile}.logs", path)
     value["response_time_percentile_50"] = getResponseTimeP50(f"{n}_locust_exporter_{timestampFile}.logs", path)
+    value["current_rps_aggregated"] = getCurrentRPSAggregated(f"{n}_locust_exporter_{timestampFile}.logs", path)
     #value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
     values.append(value)
   
@@ -156,33 +171,47 @@ if __name__ == "__main__":
   metricsTime = getTime(values)
   p95 = getP95(values)
   p50 = getP50(values)
+  rpsA = getRSPA(values)
 
   xpoints = np.array(metricsTime)
   yP95 = np.array(p95)
   yP50 = np.array(p50)
+  yrpsA = np.array(rpsA)
   deploy = getDeploy(values)
 
-  plot1 = plt.subplot2grid((2, 1), (0, 0)) #
-  plot2 = plt.subplot2grid((2, 1), (1, 0)) #
+  plot1 = plt.subplot2grid((3, 1), (0, 0)) #
+  plot2 = plt.subplot2grid((3, 1), (1, 0)) #
+  plot3 = plt.subplot2grid((3, 1), (2, 0)) #
 
   plot1.set_title("Response Time")
   plot1.set_xlabel("Time")
   plot1.set_ylabel("ms")
   plot1.plot(xpoints, yP95, label = "P95")
   plot1.plot(xpoints, yP50, label = "P50")
+  
 
   plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
   plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
   plot1.legend()
 
-  plot2.set_title("Deployments")
+  plot2.set_title("Current RPS Aggregated")
   plot2.set_xlabel("Time")
-  for d in deploy:
-    plot2.plot(xpoints,  np.array(deploy[d]), label = d)
-  
+  plot2.set_ylabel("rps")
+
+  plot2.plot(xpoints, yrpsA, label = "rps")
+
   plot2.set_xticklabels(xpoints, rotation=45, fontsize="small")
   plot2.set_xticks(np.arange(0, len(xpoints)+1, 12))
-  plot2.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
   plot2.legend()
+
+  plot3.set_title("Deployments")
+  plot3.set_xlabel("Time")
+  for d in deploy:
+    plot3.plot(xpoints,  np.array(deploy[d]), label = d)
+  
+  plot3.set_xticklabels(xpoints, rotation=45, fontsize="small")
+  plot3.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot3.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
+  plot3.legend()
 
   plt.show()
