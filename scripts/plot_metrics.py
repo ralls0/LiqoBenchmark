@@ -44,14 +44,19 @@ def extractDigits(lst):
   print(newLst)
   return newLst
 
-def getDeployInfo(fileName: String, path: String):
+def getDeployInfo(fileName: String, path: String, linkerd = False):
   deploy = {}
   with open(f"{path}{fileName}") as f:
     for line in f:
       line = line.split(" ")
       line =  extractDigits(line)
       for e in line:
-        deploy[e[0]] = deploy.get(e[0], 0) + int(e[3])
+        if e[0] != "loadgenerator" and e[0] != "locust-exporter":
+          deploy[e[0]] = deploy.get(e[0], 0) + int(e[3])
+  
+  if linkerd:
+    for d in deploy:
+      deploy[d] = deploy.get(d, 0) - 1
 
   return deploy
 
@@ -136,49 +141,7 @@ def getDeploy(values):
   
   return deployment
 
-if __name__ == "__main__":
-  path = os.getcwd()+"/../tests/test3bis/" # "/Users/rallso/Desktop/test3/"
-  # print(f"path: {path}")
-
-  values = []
-
-  print("[i] Retrieve the list of the file")
-  listDir = os.listdir(path)
-  # print(f"list type: {type(listDir)}, listDir: {listDir}")
-  lastIndex = int(input("Insert the last file name index: "))+1
-
-  for n in range(1, lastIndex):
-    value = {}
-    processingFiles = getFileName(str(n), listDir)
-
-    timestampFile = (processingFiles[0])[-15:-5]
-    value["timestamp"] = timestampFile
-
-    print(f"[i] Processing files number {n}: {processingFiles}")
-
-    value["deploy"] = getDeployInfo(f"{n}_deploy_{timestampFile}.logs", path)
-    value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
-    value["response_time_percentile_95"] = getResponseTimeP95(f"{n}_locust_exporter_{timestampFile}.logs", path)
-    value["response_time_percentile_50"] = getResponseTimeP50(f"{n}_locust_exporter_{timestampFile}.logs", path)
-    value["current_rps_aggregated"] = getCurrentRPSAggregated(f"{n}_locust_exporter_{timestampFile}.logs", path)
-    #value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
-    values.append(value)
-  
-  fileName = input("Insert the name of the file in which you want to store data: ")
-  with open(f"{path}{fileName}.json","w+") as f:
-    f.write(json.dumps(values))
-
-  metricsTime = getTime(values)
-  p95 = getP95(values)
-  p50 = getP50(values)
-  rpsA = getRSPA(values)
-
-  xpoints = np.array(metricsTime)
-  yP95 = np.array(p95)
-  yP50 = np.array(p50)
-  yrpsA = np.array(rpsA)
-  deploy = getDeploy(values)
-
+def plotAll(xpoints, yP95, yP50, yrpsA, deploy):
   plot1 = plt.subplot2grid((3, 1), (0, 0)) #
   plot2 = plt.subplot2grid((3, 1), (1, 0)) #
   plot3 = plt.subplot2grid((3, 1), (2, 0)) #
@@ -215,3 +178,94 @@ if __name__ == "__main__":
   plot3.legend()
 
   plt.show()
+
+def plotResponceTime(xpoints, yP95, yP50):
+  plot1 = plt.subplot2grid((1, 1), (0, 0)) #
+
+  plot1.set_title("Response Time")
+  plot1.set_xlabel("Time")
+  plot1.set_ylabel("ms")
+  plot1.plot(xpoints, yP95, label = "P95")
+  plot1.plot(xpoints, yP50, label = "P50")
+  
+  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
+  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot1.legend()
+
+  plt.show()
+
+def plotRPS(xpoints, yrpsA):
+  plot1 = plt.subplot2grid((1, 1), (0, 0)) #
+
+  plot1.set_title("Current RPS Aggregated")
+  plot1.set_xlabel("Time")
+  plot1.set_ylabel("rps")
+
+  plot1.plot(xpoints, yrpsA, label = "rps")
+
+  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
+  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot1.legend()
+
+  plt.show()
+
+def plotDeploy(xpoints, deploy):
+  plot1 = plt.subplot2grid((1, 1), (0, 0)) #
+
+  plot1.set_title("Deployments")
+  plot1.set_xlabel("Time")
+  for d in deploy:
+    plot1.plot(xpoints,  np.array(deploy[d]), label = d)
+  
+  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
+  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot1.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
+  plot1.legend()
+
+  plt.show()
+
+if __name__ == "__main__":
+  path = os.getcwd()+"/tests/test4/"
+
+  values = []
+
+  print("[i] Retrieve the list of the file")
+  listDir = os.listdir(path)
+  # print(f"list type: {type(listDir)}, listDir: {listDir}")
+  lastIndex = int(input("Insert the last file name index: "))+1
+
+  for n in range(1, lastIndex):
+    value = {}
+    processingFiles = getFileName(str(n), listDir)
+
+    timestampFile = (processingFiles[0])[-15:-5]
+    value["timestamp"] = timestampFile
+
+    print(f"[i] Processing files number {n}: {processingFiles}")
+
+    value["deploy"] = getDeployInfo(f"{n}_deploy_{timestampFile}.logs", path, True) # True solo per test 4
+    value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
+    value["response_time_percentile_95"] = getResponseTimeP95(f"{n}_locust_exporter_{timestampFile}.logs", path)
+    value["response_time_percentile_50"] = getResponseTimeP50(f"{n}_locust_exporter_{timestampFile}.logs", path)
+    value["current_rps_aggregated"] = getCurrentRPSAggregated(f"{n}_locust_exporter_{timestampFile}.logs", path)
+    values.append(value)
+  
+  # fileName = input("Insert the name of the file in which you want to store data: ")
+  # with open(f"{path}{fileName}.json","w+") as f:
+  #   f.write(json.dumps(values))
+
+  metricsTime = getTime(values)
+  p95 = getP95(values)
+  p50 = getP50(values)
+  rpsA = getRSPA(values)
+
+  xpoints = np.array(metricsTime)
+  yP95 = np.array(p95)
+  yP50 = np.array(p50)
+  yrpsA = np.array(rpsA)
+  deploy = getDeploy(values)
+
+  plotResponceTime(xpoints, yP95, yP50)
+  plotRPS(xpoints, yrpsA)
+  plotDeploy(xpoints, deploy)
+  plotAll(xpoints, yP95, yP50, yrpsA, deploy)
