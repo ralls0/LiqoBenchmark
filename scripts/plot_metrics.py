@@ -142,9 +142,9 @@ def getDeploy(values):
   return deployment
 
 def plotAll(xpoints, yP95, yP50, yrpsA, deploy):
-  plot1 = plt.subplot2grid((3, 1), (0, 0)) #
-  plot2 = plt.subplot2grid((3, 1), (1, 0)) #
-  plot3 = plt.subplot2grid((3, 1), (2, 0)) #
+  plot1 = plt.subplot2grid((3, 1), (0, 0))
+  plot2 = plt.subplot2grid((3, 1), (1, 0))
+  plot3 = plt.subplot2grid((3, 1), (2, 0))
 
   plot1.set_title("Response Time")
   plot1.set_xlabel("Time")
@@ -225,13 +225,13 @@ def plotDeploy(xpoints, deploy):
   plt.show()
 
 if __name__ == "__main__":
-  path = os.getcwd()+"/tests/test4/"
+  path = os.getcwd()+"/tests/test5/"
 
   values = []
 
   print("[i] Retrieve the list of the file")
   listDir = os.listdir(path)
-  # print(f"list type: {type(listDir)}, listDir: {listDir}")
+
   lastIndex = int(input("Insert the last file name index: "))+1
 
   for n in range(1, lastIndex):
@@ -243,7 +243,7 @@ if __name__ == "__main__":
 
     print(f"[i] Processing files number {n}: {processingFiles}")
 
-    value["deploy"] = getDeployInfo(f"{n}_deploy_{timestampFile}.logs", path, True) # True solo per test 4
+    value["deploy"] = getDeployInfo(f"{n}_deploy_{timestampFile}.logs", path, False) # True solo per test 4
     value["loadAvg"] = getLoadAverage(f"{n}_uptime_{timestampFile}.logs", path)
     value["response_time_percentile_95"] = getResponseTimeP95(f"{n}_locust_exporter_{timestampFile}.logs", path)
     value["response_time_percentile_50"] = getResponseTimeP50(f"{n}_locust_exporter_{timestampFile}.logs", path)
