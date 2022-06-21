@@ -1,5 +1,11 @@
 # Tests
 
+## Test 1
+
+Online Boutique on a basic cluster:
+
+![metrics_test1](./test1/metrics_test1.png)
+
 ## Test 2
 
 Online Boutique on a multi-cluster with Liqo:
