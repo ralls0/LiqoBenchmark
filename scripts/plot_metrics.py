@@ -98,12 +98,15 @@ def getCurrentRPSAggregated(fileName: String, path: String):
 
 def getTime(values):
   _date = []
+  init = -1
   for v in values:
-    _dt = datetime.fromtimestamp(int(v.get("timestamp")))
-    _hour = _dt.hour
+    if init == -1:
+      init = int(v.get("timestamp"))
+
+    _dt = datetime.fromtimestamp(int(v.get("timestamp"))-init)
     _minute = _dt.minute
     _sec = _dt.second
-    _date.append(f"{_hour}:{_minute}:{_sec}")
+    _date.append(f"{_minute}:{_sec}")
   
   return _date
 
@@ -141,7 +144,7 @@ def getDeploy(values):
   
   return deployment
 
-def plotAll(xpoints, yP95, yP50, yrpsA, deploy):
+def plotAll(xpoints, yP95, yP50, yrpsA, deploy, startHPA):
   plot1 = plt.subplot2grid((3, 1), (0, 0))
   plot2 = plt.subplot2grid((3, 1), (1, 0))
   plot3 = plt.subplot2grid((3, 1), (2, 0))
@@ -155,6 +158,8 @@ def plotAll(xpoints, yP95, yP50, yrpsA, deploy):
 
   plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
   plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot1.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plot1.grid()
   plot1.legend()
 
   plot2.set_title("Current RPS Aggregated")
@@ -165,6 +170,8 @@ def plotAll(xpoints, yP95, yP50, yrpsA, deploy):
 
   plot2.set_xticklabels(xpoints, rotation=45, fontsize="small")
   plot2.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot2.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plot2.grid()
   plot2.legend()
 
   plot3.set_title("Deployments")
@@ -175,11 +182,13 @@ def plotAll(xpoints, yP95, yP50, yrpsA, deploy):
   plot3.set_xticklabels(xpoints, rotation=45, fontsize="small")
   plot3.set_xticks(np.arange(0, len(xpoints)+1, 12))
   plot3.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
+  plot3.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plot3.grid()
   plot3.legend()
 
   plt.show()
 
-def plotResponceTime(xpoints, yP95, yP50):
+def plotResponceTime(xpoints, yP95, yP50, startHPA):
   plot1 = plt.subplot2grid((1, 1), (0, 0)) #
 
   plot1.set_title("Response Time")
@@ -192,9 +201,11 @@ def plotResponceTime(xpoints, yP95, yP50):
   plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
   plot1.legend()
 
+  plt.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plt.grid()
   plt.show()
 
-def plotRPS(xpoints, yrpsA):
+def plotRPS(xpoints, yrpsA, startHPA):
   plot1 = plt.subplot2grid((1, 1), (0, 0)) #
 
   plot1.set_title("Current RPS Aggregated")
@@ -207,9 +218,11 @@ def plotRPS(xpoints, yrpsA):
   plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
   plot1.legend()
 
+  plt.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plt.grid()
   plt.show()
 
-def plotDeploy(xpoints, deploy):
+def plotDeploy(xpoints, deploy, startHPA):
   plot1 = plt.subplot2grid((1, 1), (0, 0)) #
 
   plot1.set_title("Deployments")
@@ -222,19 +235,43 @@ def plotDeploy(xpoints, deploy):
   plot1.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
   plot1.legend()
 
+  plt.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plt.grid()
   plt.show()
 
+def getStartHPA(listDir, lastIndex: int, path: String, linkerd = False):
+  startHPA = 0
+
+  for n in range(1, lastIndex+1):
+    processingFiles = getFileName(str(n), listDir)
+    timestampFile = (processingFiles[0])[-15:-5]
+
+    try:
+      with open(f"{path}{n}_hpa_{timestampFile}.logs") as f:
+          if linkerd:
+            for line in f:
+              if len(line) > 0:
+                startHPA = n
+                break
+          else:
+            startHPA = n
+            break
+    except IOError:
+      pass
+
+  return startHPA
+
 if __name__ == "__main__":
-  path = os.getcwd()+"/tests/test5/"
+  path = os.getcwd()+"/tests/test2/"
 
   values = []
 
   print("[i] Retrieve the list of the file")
   listDir = os.listdir(path)
 
-  lastIndex = int(input("Insert the last file name index: "))+1
+  lastIndex = 264 #int(input("Insert the last file name index: "))+1
 
-  for n in range(1, lastIndex):
+  for n in range(1, lastIndex+1):
     value = {}
     processingFiles = getFileName(str(n), listDir)
 
@@ -249,23 +286,27 @@ if __name__ == "__main__":
     value["response_time_percentile_50"] = getResponseTimeP50(f"{n}_locust_exporter_{timestampFile}.logs", path)
     value["current_rps_aggregated"] = getCurrentRPSAggregated(f"{n}_locust_exporter_{timestampFile}.logs", path)
     values.append(value)
+
+  startHPA = getStartHPA(listDir, lastIndex, path)
   
-  # fileName = input("Insert the name of the file in which you want to store data: ")
-  # with open(f"{path}{fileName}.json","w+") as f:
-  #   f.write(json.dumps(values))
+  fileName = input("Insert the name of the file in which you want to store data: ")
+  with open(f"{path}{fileName}.json","w+") as f:
+    f.write(json.dumps(values))
 
   metricsTime = getTime(values)
+  print(metricsTime)
   p95 = getP95(values)
   p50 = getP50(values)
   rpsA = getRSPA(values)
 
   xpoints = np.array(metricsTime)
+  print(xpoints)
   yP95 = np.array(p95)
   yP50 = np.array(p50)
   yrpsA = np.array(rpsA)
   deploy = getDeploy(values)
 
-  plotResponceTime(xpoints, yP95, yP50)
-  plotRPS(xpoints, yrpsA)
-  plotDeploy(xpoints, deploy)
-  plotAll(xpoints, yP95, yP50, yrpsA, deploy)
+  plotResponceTime(xpoints, yP95, yP50, startHPA)
+  plotRPS(xpoints, yrpsA, startHPA)
+  plotDeploy(xpoints, deploy, startHPA)
+  plotAll(xpoints, yP95, yP50, yrpsA, deploy, startHPA)
