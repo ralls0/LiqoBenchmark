@@ -21,7 +21,6 @@ def extractDigits(lst):
   el = []
   nlst = lst
   lst = []
-  print(nlst)
   for n, e in enumerate(nlst):
     if re.search(f".+NAME$", e):
       lst.append(e[0:len(e)-4])
@@ -29,7 +28,6 @@ def extractDigits(lst):
     else:
       lst.append(e)
 
-  print(lst)
   for n, e in enumerate(lst):
     if n%5 == 0:
       if el != []:
@@ -41,7 +39,6 @@ def extractDigits(lst):
       if re.search(f"[^NAME|READY|UP\-TO\-DATE|AVAILABLE|AGE]", e):
         el.append(e)
 
-  print(newLst)
   return newLst
 
 def getDeployInfo(fileName: String, path: String, linkerd = False):
@@ -250,9 +247,11 @@ def getStartHPA(listDir, lastIndex: int, path: String, linkerd = False):
       with open(f"{path}{n}_hpa_{timestampFile}.logs") as f:
           if linkerd:
             for line in f:
-              if len(line) > 0:
+              if len(line) > 1:
                 startHPA = n
                 break
+            if startHPA > 0:
+              break
           else:
             startHPA = n
             break
@@ -262,7 +261,7 @@ def getStartHPA(listDir, lastIndex: int, path: String, linkerd = False):
   return startHPA
 
 if __name__ == "__main__":
-  path = os.getcwd()+"/tests/test2/"
+  path = os.getcwd()+"/tests/test5/"
 
   values = []
 
@@ -287,20 +286,18 @@ if __name__ == "__main__":
     value["current_rps_aggregated"] = getCurrentRPSAggregated(f"{n}_locust_exporter_{timestampFile}.logs", path)
     values.append(value)
 
-  startHPA = getStartHPA(listDir, lastIndex, path)
+  startHPA = getStartHPA(listDir, lastIndex, path, False) # True solo per test 4
   
   fileName = input("Insert the name of the file in which you want to store data: ")
   with open(f"{path}{fileName}.json","w+") as f:
     f.write(json.dumps(values))
 
   metricsTime = getTime(values)
-  print(metricsTime)
   p95 = getP95(values)
   p50 = getP50(values)
   rpsA = getRSPA(values)
 
   xpoints = np.array(metricsTime)
-  print(xpoints)
   yP95 = np.array(p95)
   yP50 = np.array(p50)
   yrpsA = np.array(rpsA)
