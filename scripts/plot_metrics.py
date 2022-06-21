@@ -104,8 +104,8 @@ def getTime(values):
       init = int(v.get("timestamp"))
 
     _dt = datetime.fromtimestamp(int(v.get("timestamp"))-init)
-    _minute = _dt.minute
-    _sec = _dt.second
+    _minute = '{:02d}'.format(int(_dt.minute))
+    _sec = '{:02d}'.format(int(_dt.second))
     _date.append(f"{_minute}:{_sec}")
   
   return _date
