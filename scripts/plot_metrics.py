@@ -2,6 +2,7 @@ import os, sys
 import re
 import json
 from datetime import *
+from tkinter.tix import Tree
 from tokenize import String
 from typing import List
 import matplotlib.pyplot as plt
@@ -141,7 +142,7 @@ def getDeploy(values):
   
   return deployment
 
-def plotAll(xpoints, yP95, yP50, yrpsA, deploy, startHPA):
+def plotAll(xpoints, xpointlabels, yP95, yP50, yrpsA, deploy, startHPA):
   plot1 = plt.subplot2grid((3, 1), (0, 0))
   plot2 = plt.subplot2grid((3, 1), (1, 0))
   plot3 = plt.subplot2grid((3, 1), (2, 0))
@@ -151,13 +152,12 @@ def plotAll(xpoints, yP95, yP50, yrpsA, deploy, startHPA):
   plot1.set_ylabel("ms")
   plot1.plot(xpoints, yP95, label = "P95")
   plot1.plot(xpoints, yP50, label = "P50")
-  
 
-  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
-  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
-  plot1.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plot1.axvline(x = startHPA, color = 'r', label = "start_hpa")
+  plot1.set_xticks(xpointlabels)
+  plot1.set_xticklabels(xpointlabels, rotation=45, fontsize="small")
   plot1.grid()
-  plot1.legend()
+  plot1.legend(loc='upper left')
 
   plot2.set_title("Current RPS Aggregated")
   plot2.set_xlabel("Time")
@@ -165,27 +165,29 @@ def plotAll(xpoints, yP95, yP50, yrpsA, deploy, startHPA):
 
   plot2.plot(xpoints, yrpsA, label = "rps")
 
-  plot2.set_xticklabels(xpoints, rotation=45, fontsize="small")
-  plot2.set_xticks(np.arange(0, len(xpoints)+1, 12))
-  plot2.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plot2.axvline(x = startHPA, color = 'r', label = "start_hpa")
+  plot2.set_xticks(xpointlabels)
+  plot2.set_xticklabels(xpointlabels, rotation=45, fontsize="small")
   plot2.grid()
-  plot2.legend()
+  plot2.legend(loc='upper left')
 
   plot3.set_title("Deployments")
   plot3.set_xlabel("Time")
   for d in deploy:
     plot3.plot(xpoints,  np.array(deploy[d]), label = d)
   
-  plot3.set_xticklabels(xpoints, rotation=45, fontsize="small")
-  plot3.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot3.axvline(x = startHPA, color = 'r', label = "start_hpa")
+  plot3.set_xticks(xpointlabels)
+  plot3.set_xticklabels(xpointlabels, rotation=45, fontsize="small")
   plot3.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
-  plot3.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
   plot3.grid()
-  plot3.legend()
+  plot3.legend(loc='upper left')
 
+  plt.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.95, wspace=0.2, hspace=0.5)
+  # plt.tight_layout()
   plt.show()
 
-def plotResponceTime(xpoints, yP95, yP50, startHPA):
+def plotResponceTime(xpoints, xpointlabels, yP95, yP50, startHPA):
   plot1 = plt.subplot2grid((1, 1), (0, 0)) #
 
   plot1.set_title("Response Time")
@@ -194,15 +196,15 @@ def plotResponceTime(xpoints, yP95, yP50, startHPA):
   plot1.plot(xpoints, yP95, label = "P95")
   plot1.plot(xpoints, yP50, label = "P50")
   
-  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
-  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
-  plot1.legend()
+  plot1.set_xticks(xpointlabels)
+  plot1.set_xticklabels(xpointlabels, rotation=45, fontsize="small")
+  plot1.legend(loc='upper left')
 
-  plt.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plt.axvline(x = startHPA, color = 'r', label = "start_hpa")
   plt.grid()
   plt.show()
 
-def plotRPS(xpoints, yrpsA, startHPA):
+def plotRPS(xpoints, xpointlabels, yrpsA, startHPA):
   plot1 = plt.subplot2grid((1, 1), (0, 0)) #
 
   plot1.set_title("Current RPS Aggregated")
@@ -211,15 +213,15 @@ def plotRPS(xpoints, yrpsA, startHPA):
 
   plot1.plot(xpoints, yrpsA, label = "rps")
 
-  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
-  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
-  plot1.legend()
+  plot1.set_xticks(xpointlabels)
+  plot1.set_xticklabels(xpointlabels, rotation=45, fontsize="small")
+  plot1.legend(loc='upper left')
 
-  plt.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plt.axvline(x = startHPA, color = 'r', label = "start_hpa")
   plt.grid()
   plt.show()
 
-def plotDeploy(xpoints, deploy, startHPA):
+def plotDeploy(xpoints, xpointlabels, deploy, startHPA):
   plot1 = plt.subplot2grid((1, 1), (0, 0)) #
 
   plot1.set_title("Deployments")
@@ -227,12 +229,12 @@ def plotDeploy(xpoints, deploy, startHPA):
   for d in deploy:
     plot1.plot(xpoints,  np.array(deploy[d]), label = d)
   
-  plot1.set_xticklabels(xpoints, rotation=45, fontsize="small")
-  plot1.set_xticks(np.arange(0, len(xpoints)+1, 12))
+  plot1.set_xticks(xpointlabels)
+  plot1.set_xticklabels(xpointlabels, rotation=45, fontsize="small")
   plot1.set_yticks(np.arange(0, max(deploy["running_pods"]), 3))
-  plot1.legend()
+  plot1.legend(loc='upper left')
 
-  plt.axvline(x = startHPA, color = 'r', label = 'axvline - full height')
+  plt.axvline(x = startHPA, color = 'r', label = "start_hpa")
   plt.grid()
   plt.show()
 
@@ -293,17 +295,19 @@ if __name__ == "__main__":
     f.write(json.dumps(values))
 
   metricsTime = getTime(values)
+  metricsTimeLabel = metricsTime[0:len(metricsTime):12]
   p95 = getP95(values)
   p50 = getP50(values)
   rpsA = getRSPA(values)
 
   xpoints = np.array(metricsTime)
+  xpointlabels = np.array(metricsTimeLabel)
   yP95 = np.array(p95)
   yP50 = np.array(p50)
   yrpsA = np.array(rpsA)
   deploy = getDeploy(values)
 
-  plotResponceTime(xpoints, yP95, yP50, startHPA)
-  plotRPS(xpoints, yrpsA, startHPA)
-  plotDeploy(xpoints, deploy, startHPA)
-  plotAll(xpoints, yP95, yP50, yrpsA, deploy, startHPA)
+  plotResponceTime(xpoints, xpointlabels, yP95, yP50, startHPA)
+  plotRPS(xpoints, xpointlabels, yrpsA, startHPA)
+  plotDeploy(xpoints, xpointlabels, deploy, startHPA)
+  plotAll(xpoints, xpointlabels, yP95, yP50, yrpsA, deploy, startHPA)
