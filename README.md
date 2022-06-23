@@ -144,7 +144,7 @@ chmod 700 get_helm.sh
 
 ## Test
 
-For these tests, you'll play with a [micro-services application provided by Google](https://github.com/GoogleCloudPlatform/microservices-demo), which includes multiple cooperating services. Four different scenarios are provided:
+For these tests, you'll play with a [micro-services application provided by Google](https://github.com/GoogleCloudPlatform/microservices-demo), which includes multiple cooperating services. Five different scenarios are provided:
 
 1. Online Boutique on a basic cluster.
 2. Online Boutique on a multi-cluster with Liqo.
